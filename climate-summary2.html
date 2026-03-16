@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#f4f7f0;min-height:100vh;padding:0 32px 60px}
+
+/* === Audio Player Bar === */
+.player{position:sticky;top:0;z-index:20;background:#fff;border-radius:0 0 16px 16px;padding:14px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin:0 -32px 24px;padding-left:56px;padding-right:56px}
+.player .label{font-size:15px;font-weight:900;color:#555;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.player .label svg{width:20px;height:20px}
+.pbtn{width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.play-btn{background:#4db6ac}
+.stop-btn{background:#ef5350}
+.pbtn svg{width:18px;height:18px}
+.progress-wrap{flex:1;display:flex;align-items:center;gap:12px}
+.progress-bar{flex:1;height:6px;background:#e0e0e0;border-radius:3px;position:relative;cursor:pointer}
+.progress-fill{height:100%;background:linear-gradient(90deg,#ef5350,#ff7043);border-radius:3px;width:0%;transition:width .3s}
+.progress-dot{width:14px;height:14px;background:#ef5350;border:2px solid #fff;border-radius:50%;position:absolute;top:50%;transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.2);left:0%}
+.time{font-size:13px;color:#888;font-weight:700;white-space:nowrap;min-width:100px;text-align:center}
+.speed-btn{background:#f5f5f5;border:1px solid #ddd;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:700;color:#555;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap}
+
+/* === Content === */
+.inst{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:700;color:#333;margin-bottom:24px;padding-top:8px}
+.inst .ic{width:22px;height:22px;background:#ffc107;border-radius:4px;display:inline-block}
+.counter{position:fixed;top:80px;right:32px;background:#e0f2f1;border-radius:20px;padding:8px 18px;font-size:15px;font-weight:700;color:#00897b;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.counter .ic{display:inline-block;width:18px;height:18px;background:#ffc107;border-radius:3px;vertical-align:middle;margin-right:4px}
+h2{font-size:26px;font-weight:900;color:#222;margin:28px 0 16px;display:flex;align-items:center;gap:10px}
+h2 .num{color:#00897b}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:24px}
+th{background:#f5f5f5;font-size:16px;font-weight:700;color:#444;padding:14px 20px;text-align:center;width:120px;border-bottom:1px solid #e0e0e0;vertical-align:top}
+td{font-size:15px;color:#333;padding:14px 20px;border-bottom:1px solid #eee;line-height:1.7;vertical-align:top}
+tr:last-child td,tr:last-child th{border-bottom:none}
+ul{margin:0;padding-left:20px}
+li{margin-bottom:4px}
+.b{display:inline-block;background:#ffc107;color:#fff;font-weight:900;border-radius:6px;padding:2px 10px;cursor:pointer;transition:all .3s;user-select:none;font-size:15px;min-width:40px;text-align:center}
+.b.open{background:#fff;color:#333;border:2px solid #ffc107;font-weight:700}
+.sub{font-size:13px;color:#888;margin-top:2px}
+</style>
+</head>
+<body>
+
+<!-- Audio Player -->
+<div class="player">
+  <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M12 3a9 9 0 110 18 9 9 0 010-18z"/><path d="M8 12h0M12 8h0M16 12h0M12 16h0" stroke-linecap="round" stroke-width="3"/></svg>AI 오디오로<br>공부하기</div>
+  <button class="pbtn play-btn" id="playBtn" onclick="togglePlay()">
+    <svg id="playIco" viewBox="0 0 24 24" fill="white"><polygon points="6,4 20,12 6,20"/></svg>
+    <svg id="pauseIco" viewBox="0 0 24 24" fill="white" style="display:none"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg>
+  </button>
+  <button class="pbtn stop-btn" onclick="stopPlay()">
+    <svg viewBox="0 0 24 24" fill="white"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+  </button>
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progBar" onclick="seek(event)">
+      <div class="progress-fill" id="progFill"></div>
+      <div class="progress-dot" id="progDot"></div>
+    </div>
+  </div>
+  <div class="time" id="timeDisp">00:00 / 00:00</div>
+  <button class="speed-btn" id="speedBtn" onclick="changeSpeed()">1.0x</button>
+  <select id="voiceSel" style="font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;color:#555;border:1px solid #ddd;border-radius:20px;padding:4px 10px;background:#f5f5f5;max-width:160px;cursor:pointer"></select>
+</div>
+
+<div class="inst"><span class="ic"></span>를 모두 클릭하여 내용을 정리해 보세요.</div>
+<div class="counter"><span class="ic"></span> <span id="cnt">0</span> / <span id="tot">0</span></div>
+
+<h2><span class="num">1.</span> 기후</h2>
+<table>
+<tr><th>의미</th><td><span class="b" data-a="오랜 기간">ㅇㄹ ㄱㄱ</span> 한 지역에서 나타나는 평균적이며 종합적인 대기 상태</td></tr>
+<tr><th>구성 요소</th><td><ul>
+<li><span class="b" data-a="기온">ㄱㅇ</span>: 공기의 따뜻하고 차가운 정도</li>
+<li><span class="b" data-a="강수">ㄱㅅ</span>: 눈, 비 등 땅에 내린 물</li>
+<li><span class="b" data-a="바람">ㅂㄹ</span>: 공기가 움직이는 현상</li>
+</ul></td></tr>
+<tr><th>사례</th><td><ul>
+<li>봄, 여름, 가을, 겨울의 <span class="b" data-a="사계절">ㅅㄱㅈ</span>이 나타남.</li>
+<li>여름에는 덥고, 겨울에는 추움.</li>
+</ul></td></tr>
+<tr><th>중요성</th><td>사람들의 의식주나 산업 발전 등 생활에 많은 <span class="b" data-a="영향">ㅇㅎ</span>을 줌.</td></tr>
+</table>
+
+<h2><span class="num">2.</span> 계절별 기후와 생활 모습</h2>
+<table>
+<tr><th>계절풍</th><td><ul>
+<li>여름: <span class="b" data-a="남쪽">ㄴㅉ</span> 바다에서 뜨겁고 <span class="b" data-a="습한">ㅅㅎ</span> 바람이 불어옴 → 더워지고 비가 많이 내림</li>
+<li>겨울: <span class="b" data-a="북서쪽">ㅂㅅㅉ</span> 육지에서 차갑고 <span class="b" data-a="건조한">ㄱㅈㅎ</span> 바람이 불어옴 → 추워짐</li>
+</ul></td></tr>
+<tr><th>봄</th><td>대체로 온화하고 건조하지만, 날씨의 변화가 심함. 농사를 시작하며 꽃놀이를 함.</td></tr>
+<tr><th>여름</th><td>기온이 올라 덥고, 비가 자주 옴. 더위를 피해 바다나 숲 등 시원한 곳을 찾음.</td></tr>
+<tr><th>가을</th><td>맑고 건조한 날씨. <span class="b" data-a="단풍">ㄷㅍ</span>놀이를 즐기고, 잘 익은 곡식을 거둠.</td></tr>
+<tr><th>겨울</th><td>춥고 건조하며 눈이 내리기도 함. 따뜻한 옷을 입고 겨울 스포츠를 즐김.</td></tr>
+</table>
+
+<h2><span class="num">3.</span> 기온 분포 특징</h2>
+<table>
+<tr><th>여름 기온</th><td>전국적으로 평균 기온이 <span class="b" data-a="높고">ㄴㄱ</span>, 남북 기온 차이가 비교적 <span class="b" data-a="작음">ㅈㅇ</span>.</td></tr>
+<tr><th>겨울 기온</th><td>전국적으로 평균 기온이 <span class="b" data-a="낮고">ㄴㄱ</span>, 남북 기온 차이가 <span class="b" data-a="큼">ㅋ</span>.</td></tr>
+<tr><th>남북 차이</th><td>남북으로 길게 뻗어 있어 <span class="b" data-a="남쪽">ㄴㅉ</span>으로 갈수록 기온이 높아지고, <span class="b" data-a="북쪽">ㅂㅉ</span>으로 갈수록 기온이 낮아짐.</td></tr>
+<tr><th>지역 차이</th><td>같은 계절이라도 산, 하천, 바다 등의 영향으로 지역에 따라 기온이 다름.<div class="sub">예) 겨울: 인천(눈 쌓인 거리) vs 제주(무 수확)</div></td></tr>
+</table>
+
+<h2><span class="num">4.</span> 강수량 분포 특징</h2>
+<table>
+<tr><th>계절별</th><td><span class="b" data-a="여름">ㅇㄹ</span>에 연 강수량의 절반 이상이 내림. 겨울에는 강수량이 <span class="b" data-a="적음">ㅈㅇ</span>.</td></tr>
+<tr><th>지역별</th><td>대체로 <span class="b" data-a="북쪽">ㅂㅉ</span>에서 <span class="b" data-a="남쪽">ㄴㅉ</span>으로 갈수록 연 강수량이 많아짐.</td></tr>
+<tr><th>예외</th><td>바람의 방향과 <span class="b" data-a="지형">ㅈㅎ</span>의 영향으로 지역별로 강수량에 차이가 나기도 함.</td></tr>
+</table>
+
+<script>
+// === 뚜껑열기 ===
+const bs=document.querySelectorAll('.b'),cntEl=document.getElementById('cnt'),totEl=document.getElementById('tot');
+let opened=0;
+totEl.textContent=bs.length;
+bs.forEach(b=>{b.addEventListener('click',()=>{if(b.classList.contains('open'))return;b.classList.add('open');b.textContent=b.dataset.a;opened++;cntEl.textContent=opened})});
+
+// === TTS 더빙 ===
+const script=[
+  "기후의 핵심 내용을 정리해 봅시다.",
+  "첫 번째, 기후입니다. 기후란, 오랜 기간 한 지역에서 나타나는 평균적이며 종합적인 대기 상태를 말합니다.",
+  "기후를 이루는 구성 요소에는 기온, 강수, 바람이 있습니다. 기온은 공기의 따뜻하고 차가운 정도이고, 강수는 눈이나 비 등 땅에 내린 물, 바람은 공기가 움직이는 현상입니다.",
+  "우리나라는 봄, 여름, 가을, 겨울의 사계절이 뚜렷하게 나타나며, 기후는 사람들의 생활에 많은 영향을 줍니다.",
+  "두 번째, 계절별 기후와 생활 모습입니다.",
+  "여름에는 남쪽 바다에서 뜨겁고 습한 바람이 불어와 더워지고 비가 많이 내립니다. 겨울에는 북서쪽 육지에서 차갑고 건조한 바람이 불어와 추워집니다.",
+  "봄은 온화하지만 날씨 변화가 심하고, 여름은 덥고 비가 자주 옵니다. 가을은 맑고 건조하며, 겨울은 춥고 건조합니다.",
+  "세 번째, 기온 분포 특징입니다.",
+  "여름에는 전국적으로 평균 기온이 높고 남북 차이가 작지만, 겨울에는 평균 기온이 낮고 남북 차이가 큽니다.",
+  "우리나라는 남북으로 길게 뻗어 있어, 남쪽으로 갈수록 기온이 높아지고 북쪽으로 갈수록 낮아집니다.",
+  "네 번째, 강수량 분포 특징입니다.",
+  "여름에 연 강수량의 절반 이상이 내리며, 대체로 북쪽에서 남쪽으로 갈수록 강수량이 많아집니다.",
+  "다만 바람의 방향과 지형의 영향으로 지역별 차이가 나기도 합니다.",
+  "이상으로 정리를 마칩니다. 노란색 뚜껑을 모두 클릭하여 핵심 단어를 확인해 보세요."
+];
+
+let utterances=[], currentIdx=0, isPlaying=false, totalDur=0, startTime=0, pausedAt=0, speeds=[1,1.2,1.5,0.8], speedIdx=0;
+const playBtn=document.getElementById('playBtn'),playIco=document.getElementById('playIco'),pauseIco=document.getElementById('pauseIco');
+const progFill=document.getElementById('progFill'),progDot=document.getElementById('progDot'),timeDisp=document.getElementById('timeDisp');
+let timerInterval=null;
+
+// 예상 총 시간 (글자수 기반, 초당 약 5글자)
+const totalChars=script.join('').length;
+totalDur=Math.round(totalChars/5);
+
+function fmt(s){const m=Math.floor(s/60),ss=Math.floor(s%60);return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0')}
+
+function updateTime(){
+  if(!isPlaying)return;
+  const elapsed=Math.min((Date.now()-startTime)/1000,totalDur);
+  const pct=Math.min(elapsed/totalDur*100,100);
+  progFill.style.width=pct+'%';
+  progDot.style.left=pct+'%';
+  timeDisp.textContent=fmt(elapsed)+' / '+fmt(totalDur);
+}
+
+function togglePlay(){
+  if(!isPlaying) startPlay();
+  else pausePlay();
+}
+
+function startPlay(){
+  if(!window.speechSynthesis)return alert('이 브라우저는 음성 합성을 지원하지 않습니다.');
+  window.speechSynthesis.cancel();
+  isPlaying=true;
+  playIco.style.display='none';
+  pauseIco.style.display='block';
+  startTime=Date.now()-(pausedAt*1000);
+  timerInterval=setInterval(updateTime,200);
+  speakFrom(currentIdx);
+}
+
+function pausePlay(){
+  isPlaying=false;
+  window.speechSynthesis.cancel();
+  playIco.style.display='block';
+  pauseIco.style.display='none';
+  pausedAt=(Date.now()-startTime)/1000;
+  clearInterval(timerInterval);
+}
+
+function stopPlay(){
+  isPlaying=false;
+  window.speechSynthesis.cancel();
+  currentIdx=0;pausedAt=0;
+  playIco.style.display='block';
+  pauseIco.style.display='none';
+  progFill.style.width='0%';
+  progDot.style.left='0%';
+  timeDisp.textContent='00:00 / '+fmt(totalDur);
+  clearInterval(timerInterval);
+}
+
+function speakFrom(idx){
+  if(idx>=script.length){stopPlay();progFill.style.width='100%';progDot.style.left='100%';return}
+  const u=new SpeechSynthesisUtterance(script[idx]);
+  u.lang='ko-KR';
+  u.rate=speeds[speedIdx];
+  const selIdx=voiceSel.value;
+  if(selIdx&&voices[selIdx])u.voice=voices[selIdx];
+  u.onend=()=>{currentIdx=idx+1;if(isPlaying)speakFrom(idx+1)};
+  window.speechSynthesis.speak(u);
+}
+
+function changeSpeed(){
+  speedIdx=(speedIdx+1)%speeds.length;
+  document.getElementById('speedBtn').textContent=speeds[speedIdx]+'x';
+  if(isPlaying){window.speechSynthesis.cancel();speakFrom(currentIdx)}
+}
+
+function seek(e){
+  const rect=document.getElementById('progBar').getBoundingClientRect();
+  const pct=(e.clientX-rect.left)/rect.width;
+  pausedAt=pct*totalDur;
+  progFill.style.width=(pct*100)+'%';
+  progDot.style.left=(pct*100)+'%';
+  timeDisp.textContent=fmt(pausedAt)+' / '+fmt(totalDur);
+  // 대략적 위치로 스크립트 인덱스 추정
+  currentIdx=Math.min(Math.floor(pct*script.length),script.length-1);
+  if(isPlaying){startTime=Date.now()-(pausedAt*1000);window.speechSynthesis.cancel();speakFrom(currentIdx)}
+}
+
+timeDisp.textContent='00:00 / '+fmt(totalDur);
+
+// === 음성 목록 로드 ===
+const voiceSel=document.getElementById('voiceSel');
+let voices=[];
+function loadVoices(){
+  voices=speechSynthesis.getVoices();
+  voiceSel.innerHTML='';
+  // 한국어 우선, 그 외도 표시
+  const ko=voices.filter(v=>v.lang.startsWith('ko'));
+  const etc=voices.filter(v=>!v.lang.startsWith('ko'));
+  ko.forEach((v,i)=>{const o=document.createElement('option');o.value=voices.indexOf(v);o.textContent='🇰🇷 '+v.name;voiceSel.appendChild(o)});
+  if(ko.length&&etc.length){const sep=document.createElement('option');sep.disabled=true;sep.textContent='── 기타 ──';voiceSel.appendChild(sep)}
+  etc.forEach(v=>{const o=document.createElement('option');o.value=voices.indexOf(v);o.textContent=v.name;voiceSel.appendChild(o)});
+}
+speechSynthesis.onvoiceschanged=loadVoices;
+loadVoices();
+</script>
+</body>
+</html>
