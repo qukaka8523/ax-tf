@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    background: #f0f4e8;
+    position: relative;
+  }
+
+  /* === Top Nav === */
+  .nav {
+    position: absolute; top: 16px; left: 16px; z-index: 10;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(40,40,40,0.85);
+    border-radius: 24px; padding: 8px 20px;
+    color: #fff; font-size: 14px; font-weight: 700;
+  }
+  .nav .unit {
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px; padding: 2px 10px;
+    font-size: 13px;
+  }
+  .nav .sep { color: #aaa; margin: 0 2px; }
+  .nav .current { color: #a8e06c; }
+
+  /* === Close Button === */
+  .close-btn {
+    position: absolute; top: 0; right: 0; z-index: 10;
+    width: 64px; height: 64px;
+    background: #4caf50;
+    border-radius: 0 0 0 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: none;
+  }
+  .close-btn svg { width: 28px; height: 28px; }
+
+  /* === Left Illustration Area === */
+  .illust-area {
+    position: absolute;
+    left: 0; top: 0;
+    width: 52%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  .illust-bg {
+    position: relative;
+    width: 420px; height: 460px;
+    background: linear-gradient(135deg, #e8f5fe 0%, #d1ecf9 40%, #b8e0f0 100%);
+    border-radius: 40% 45% 50% 35% / 40% 50% 40% 45%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  }
+
+  /* Season scenes inside blob */
+  .scene-container {
+    position: relative;
+    width: 340px; height: 380px;
+  }
+
+  .scene {
+    position: absolute;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+  }
+  .scene.active { opacity: 1; pointer-events: auto; }
+
+  .scene-emoji {
+    font-size: 100px;
+    margin-bottom: 8px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .scene-label {
+    font-size: 22px; font-weight: 900;
+    color: #fff;
+    background: rgba(0,0,0,0.25);
+    border-radius: 20px;
+    padding: 6px 24px;
+    margin-top: 4px;
+  }
+
+  .scene-desc {
+    font-size: 15px; color: #4a6a7a;
+    margin-top: 12px; text-align: center;
+    line-height: 1.6;
+    background: rgba(255,255,255,0.7);
+    border-radius: 16px;
+    padding: 12px 20px;
+    max-width: 300px;
+  }
+
+  /* Spring */
+  .scene.spring .illust-bg-override { background: linear-gradient(135deg, #fce4ec, #f8bbd0); }
+  .scene.spring .scene-label { background: #e91e80aa; }
+
+  /* Summer */
+  .scene.summer .scene-label { background: #0288d1aa; }
+
+  /* Autumn */
+  .scene.autumn .scene-label { background: #e65100aa; }
+
+  /* Winter */
+  .scene.winter .scene-label { background: #5c6bc0aa; }
+
+  /* Season indicator dots */
+  .season-dots {
+    position: absolute;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 10px; z-index: 5;
+  }
+  .season-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #ccc;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+  }
+  .season-dot.active {
+    background: #ff5252;
+    transform: scale(1.3);
+    border-color: #fff;
+  }
+
+  /* Character overlay */
+  .character {
+    position: absolute;
+    bottom: 40px; left: 60px;
+    z-index: 6;
+  }
+  .character svg {
+    width: 110px; height: 130px;
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.15));
+  }
+
+  /* === Right Content Area === */
+  .content-area {
+    position: absolute;
+    right: 0; top: 0;
+    width: 48%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px;
+  }
+
+  .chapter-num {
+    font-size: 52px; font-weight: 900;
+    color: #e53935;
+    margin-bottom: 8px;
+  }
+
+  .chapter-title {
+    font-size: 34px; font-weight: 900;
+    color: #222;
+    text-align: center;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+
+  .chapter-sub {
+    font-size: 16px; color: #666;
+    text-align: center;
+    line-height: 1.7;
+    max-width: 360px;
+    margin-bottom: 12px;
+  }
+
+  .learning-goals {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px 24px;
+    margin-top: 8px;
+    max-width: 380px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .learning-goals h4 {
+    font-size: 14px; color: #e53935;
+    margin-bottom: 10px; font-weight: 700;
+  }
+  .goal-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    margin-bottom: 8px;
+    font-size: 14px; color: #444;
+    line-height: 1.5;
+  }
+  .goal-item:last-child { margin-bottom: 0; }
+  .goal-check {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    background: #e8f5e9;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .goal-check svg { width: 12px; height: 12px; }
+
+  /* === Start Button === */
+  .start-btn {
+    position: absolute;
+    bottom: 36px; right: 40px; z-index: 10;
+    background: #e53935;
+    color: #fff;
+    border: none; border-radius: 40px;
+    padding: 16px 48px;
+    font-size: 22px; font-weight: 900;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 6px 20px rgba(229,57,53,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(229,57,53,0.45);
+  }
+  .start-btn svg { width: 20px; height: 20px; }
+
+  /* === Bottom Decoration === */
+  .bottom-deco {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    overflow: hidden; z-index: 1;
+  }
+
+  /* === Animations === */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .content-area > * {
+    animation: fadeInUp 0.6s ease-out both;
+  }
+  .chapter-num { animation-delay: 0.1s; }
+  .chapter-title { animation-delay: 0.2s; }
+  .chapter-sub { animation-delay: 0.3s; }
+  .learning-goals { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+  <!-- Top Nav -->
+  <div class="nav">
+    <span class="unit">2단원</span>
+    <span>우리 국토의 자연환경</span>
+    <span class="sep">›</span>
+    <span class="current">우리나라의 기후</span>
+  </div>
+
+  <!-- Close Button -->
+  <button class="close-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round">
+      <line x1="6" y1="6" x2="18" y2="18"/>
+      <line x1="18" y1="6" x2="6" y2="18"/>
+    </svg>
+  </button>
+
+  <!-- Left Illustration -->
+  <div class="illust-area">
+    <div class="illust-bg" id="illustBg">
+
+      <!-- Seasons rotate -->
+      <div class="scene-container">
+        <!-- Spring -->
+        <div class="scene spring active" data-season="spring">
+          <div class="scene-emoji">🌸</div>
+          <div class="scene-label">봄</div>
+          <div class="scene-desc">따뜻해지며 꽃이 피고<br>날씨 변화가 심해요</div>
+        </div>
+        <!-- Summer -->
+        <div class="scene summer" data-season="summer">
+          <div class="scene-emoji">☀️</div>
+          <div class="scene-label">여름</div>
+          <div class="scene-desc">기온이 높고 비가 자주 와요<br>남쪽에서 습한 바람이 불어요</div>
+        </div>
+        <!-- Autumn -->
+        <div class="scene autumn" data-season="autumn">
+          <div class="scene-emoji">🍂</div>
+          <div class="scene-label">가을</div>
+          <div class="scene-desc">맑고 건조한 날씨예요<br>단풍놀이를 즐겨요</div>
+        </div>
+        <!-- Winter -->
+        <div class="scene winter" data-season="winter">
+          <div class="scene-emoji">❄️</div>
+          <div class="scene-label">겨울</div>
+          <div class="scene-desc">춥고 건조하며 눈이 와요<br>북서쪽에서 찬 바람이 불어요</div>
+        </div>
+      </div>
+
+      <!-- Season dots -->
+      <div class="season-dots">
+        <div class="season-dot active" data-idx="0"></div>
+        <div class="season-dot" data-idx="1"></div>
+        <div class="season-dot" data-idx="2"></div>
+        <div class="season-dot" data-idx="3"></div>
+      </div>
+    </div>
+
+    <!-- Character -->
+    <div class="character">
+      <svg viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Body -->
+        <ellipse cx="60" cy="95" rx="38" ry="40" fill="white" stroke="#ddd" stroke-width="2"/>
+        <!-- Face -->
+        <circle cx="45" cy="85" r="5" fill="#333"/>
+        <circle cx="75" cy="85" r="5" fill="#333"/>
+        <ellipse cx="60" cy="97" rx="8" ry="5" fill="#ffcdd2"/>
+        <!-- Hat (weather hat) -->
+        <ellipse cx="60" cy="62" rx="42" ry="10" fill="#ff9800"/>
+        <rect x="35" y="30" width="50" height="34" rx="16" fill="#ffb74d"/>
+        <!-- Antenna -->
+        <line x1="60" y1="30" x2="60" y2="16" stroke="#4caf50" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="60" cy="12" r="6" fill="#4caf50"/>
+        <!-- Magnifying glass -->
+        <circle cx="95" cy="105" r="12" fill="none" stroke="#5c6bc0" stroke-width="3"/>
+        <line x1="103" y1="114" x2="112" y2="125" stroke="#5c6bc0" stroke-width="3" stroke-linecap="round"/>
+        <!-- Arm -->
+        <path d="M 85 95 Q 92 100 93 105" stroke="#ddd" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Right Content -->
+  <div class="content-area">
+    <div class="chapter-num">2장</div>
+    <div class="chapter-title">기후가 무엇인지<br>알아볼까요</div>
+    <div class="chapter-sub">
+      날씨와 기후는 어떻게 다를까요?<br>
+      우리나라의 사계절 기후 특징을 탐험해 봐요!
+    </div>
+    <div class="learning-goals">
+      <h4>📌 학습 목표</h4>
+      <div class="goal-item">
+        <div class="goal-check">
+          <svg viewBox="0 0 12 12" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg>
+        </div>
+        <span>날씨와 기후의 차이를 설명할 수 있어요.</span>
+      </div>
+      <div class="goal-item">
+        <div class="goal-check">
+          <svg viewBox="0 0 12 12" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg>
+        </div>
+        <span>우리나라의 계절별 기후 특징을 파악할 수 있어요.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Button -->
+  <button class="start-btn">
+    공부 시작
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9,6 15,12 9,18"/>
+    </svg>
+  </button>
+
+  <!-- Bottom Decoration -->
+  <div class="bottom-deco">
+    <svg width="100%" height="80" viewBox="0 0 1400 80" preserveAspectRatio="none">
+      <path d="M0,40 Q100,10 200,35 T400,30 T600,40 T800,25 T1000,38 T1200,30 T1400,40 L1400,80 L0,80 Z" fill="#a5d6a7" opacity="0.5"/>
+      <path d="M0,55 Q150,30 300,50 T600,45 T900,55 T1200,42 T1400,55 L1400,80 L0,80 Z" fill="#81c784" opacity="0.6"/>
+      <path d="M0,65 Q200,50 400,62 T800,58 T1200,65 T1400,60 L1400,80 L0,80 Z" fill="#66bb6a" opacity="0.7"/>
+      <!-- Trees -->
+      <polygon points="100,50 108,30 116,50" fill="#388e3c" opacity="0.8"/>
+      <rect x="106" y="50" width="4" height="8" fill="#5d4037" opacity="0.8"/>
+      <polygon points="250,55 256,38 262,55" fill="#2e7d32" opacity="0.7"/>
+      <rect x="254" y="55" width="4" height="6" fill="#5d4037" opacity="0.7"/>
+      <polygon points="1250,48 1258,28 1266,48" fill="#388e3c" opacity="0.8"/>
+      <rect x="1256" y="48" width="4" height="8" fill="#5d4037" opacity="0.8"/>
+      <polygon points="1100,52 1107,35 1114,52" fill="#2e7d32" opacity="0.7"/>
+      <rect x="1105" y="52" width="4" height="7" fill="#5d4037" opacity="0.7"/>
+      <!-- Buildings -->
+      <rect x="50" y="42" width="22" height="38" rx="2" fill="#78909c" opacity="0.4"/>
+      <rect x="54" y="48" width="5" height="5" rx="1" fill="#bbdefb" opacity="0.6"/>
+      <rect x="63" y="48" width="5" height="5" rx="1" fill="#bbdefb" opacity="0.6"/>
+      <rect x="54" y="58" width="5" height="5" rx="1" fill="#bbdefb" opacity="0.6"/>
+      <rect x="63" y="58" width="5" height="5" rx="1" fill="#bbdefb" opacity="0.6"/>
+      <rect x="1300" y="38" width="26" height="42" rx="2" fill="#78909c" opacity="0.4"/>
+      <rect x="1304" y="44" width="5" height="5" rx="1" fill="#fff9c4" opacity="0.6"/>
+      <rect x="1315" y="44" width="5" height="5" rx="1" fill="#fff9c4" opacity="0.6"/>
+      <rect x="1304" y="54" width="5" height="5" rx="1" fill="#fff9c4" opacity="0.6"/>
+      <rect x="1315" y="54" width="5" height="5" rx="1" fill="#fff9c4" opacity="0.6"/>
+    </svg>
+  </div>
+
+  <script>
+    const scenes = document.querySelectorAll('.scene');
+    const dots = document.querySelectorAll('.season-dot');
+    const illustBg = document.getElementById('illustBg');
+    let current = 0;
+    const bgColors = [
+      'linear-gradient(135deg, #fce4ec 0%, #f8bbd0 50%, #f48fb1 100%)',
+      'linear-gradient(135deg, #e3f2fd 0%, #90caf9 50%, #42a5f5 100%)',
+      'linear-gradient(135deg, #fff3e0 0%, #ffcc80 50%, #ffa726 100%)',
+      'linear-gradient(135deg, #e8eaf6 0%, #9fa8da 50%, #7986cb 100%)'
+    ];
+
+    function showSeason(idx) {
+      scenes.forEach((s, i) => s.classList.toggle('active', i === idx));
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      illustBg.style.background = bgColors[idx];
+      current = idx;
+    }
+
+    dots.forEach(d => {
+      d.addEventListener('click', () => showSeason(parseInt(d.dataset.idx)));
+    });
+
+    // Auto-rotate every 3s
+    setInterval(() => {
+      showSeason((current + 1) % 4);
+    }, 3000);
+  </script>
+</body>
+</html>
