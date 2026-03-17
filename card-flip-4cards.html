@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;width:100vw;height:100vh;overflow:hidden;background:#f5f5f5;display:flex;flex-direction:column;padding:24px 28px}
+@media(max-width:768px){body{padding:18px 14px;height:auto;min-height:100vh;overflow-y:auto}}
+.inst{display:flex;align-items:center;gap:10px;margin-bottom:20px;font-size:17px;font-weight:700;color:#333}
+.chk{width:22px;height:22px;background:#9e9e9e;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chk svg{width:13px;height:13px}
+.cards{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;perspective:1200px}
+@media(max-width:768px){.cards{grid-template-columns:repeat(2,1fr);gap:14px}}
+.cw{cursor:pointer;min-height:220px}
+@media(max-width:768px){.cw{min-height:200px}}
+.cd{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1);border-radius:14px}
+.cw.f .cd{transform:rotateY(180deg)}
+.cf,.cb{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:14px;overflow:hidden}
+.cf{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#616161}
+.cf::after{content:'';position:absolute;width:200%;height:60%;top:20%;left:-50%;background:rgba(255,255,255,.04);transform:rotate(-12deg)}
+.kw{font-size:36px;font-weight:900;color:#fff;z-index:2}
+@media(max-width:768px){.kw{font-size:28px}}
+.hi{position:absolute;bottom:12px;right:16px;font-size:24px;opacity:.6;animation:hb 2s ease-in-out infinite;z-index:2}
+.cw.f .hi{display:none}
+@keyframes hb{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.cb{transform:rotateY(180deg);background:#fff;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.cbh{padding:12px;text-align:center;font-size:20px;font-weight:900;color:#fff;background:#616161}
+@media(max-width:768px){.cbh{font-size:18px;padding:10px}}
+.cbb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center}
+.cbb .em{font-size:38px;margin-bottom:10px}
+@media(max-width:768px){.cbb .em{font-size:32px}}
+.cbb .df{font-size:15px;font-weight:700;color:#333;line-height:1.5}
+@media(max-width:768px){.cbb .df{font-size:14px}}
+.cbb .ex{margin-top:10px;font-size:12px;color:#999;background:#f5f5f5;border-radius:8px;padding:8px 12px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="inst">
+  <div class="chk"><svg viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="3,7 6,10 11,4"/></svg></div>
+  오늘 공부할 내용의 핵심 키워드를 확인해 보세요.
+</div>
+<div class="cards">
+  <div class="cw" onclick="this.classList.toggle('f')">
+    <div class="cd">
+      <div class="cf"><span class="kw">날씨</span><span class="hi">👆</span></div>
+      <div class="cb"><div class="cbh">날씨</div><div class="cbb"><div class="em">🌤️</div><div class="df">어떤 지역의 <strong>짧은 시간</strong> 동안의<br>대기 상태</div><div class="ex">예) "오늘은 맑고 쾌청해요."</div></div></div>
+    </div>
+  </div>
+  <div class="cw" onclick="this.classList.toggle('f')">
+    <div class="cd">
+      <div class="cf"><span class="kw">기후</span><span class="hi">👆</span></div>
+      <div class="cb"><div class="cbh">기후</div><div class="cbb"><div class="em">🌏</div><div class="df"><strong>오랜 기간</strong> 한 지역의<br>평균적이며 종합적인 대기 상태</div><div class="ex">예) "우리나라는 사계절이 뚜렷해요."</div></div></div>
+    </div>
+  </div>
+  <div class="cw" onclick="this.classList.toggle('f')">
+    <div class="cd">
+      <div class="cf"><span class="kw">계절풍</span><span class="hi">👆</span></div>
+      <div class="cb"><div class="cbh">계절풍</div><div class="cbb"><div class="em">🌬️</div><div class="df">계절에 따라 <strong>방향과 성질</strong>이<br>달라지는 바람</div><div class="ex">예) "여름엔 남쪽에서 습한 바람이 불어요."</div></div></div>
+    </div>
+  </div>
+  <div class="cw" onclick="this.classList.toggle('f')">
+    <div class="cd">
+      <div class="cf"><span class="kw">강수량</span><span class="hi">👆</span></div>
+      <div class="cb"><div class="cbh">강수량</div><div class="cbb"><div class="em">🌧️</div><div class="df">눈, 비 등 땅에 내린<br><strong>물의 양</strong></div><div class="ex">예) "여름에 연 강수량의 절반 이상이 내려요."</div></div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
