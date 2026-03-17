@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>활동 디스크립션 생성기</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#f5f5f5;min-height:100vh;padding:24px 16px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:22px;font-weight:900;color:#333;text-align:center;margin-bottom:20px}
+.sec{border:2px solid #1976d2;border-radius:12px;padding:20px;margin-bottom:20px;background:#fff}
+.label{font-size:13px;font-weight:700;color:#555;margin-bottom:6px}
+.url-input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid #ccc;font-size:13px;font-family:monospace}
+.row{display:flex;gap:12px;align-items:flex-end;margin-bottom:16px}
+.row .col{flex:1}
+.gen-btn{padding:10px 28px;border-radius:8px;border:2px solid #333;background:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .2s;white-space:nowrap;height:42px}
+.gen-btn:hover{background:#333;color:#fff}
+.preview-box{border:2px solid #e0e0e0;border-radius:12px;overflow:hidden;background:#fff;position:relative;margin-bottom:20px}
+.preview-box iframe{width:100%;height:500px;border:none;display:block}
+.preview-placeholder{height:500px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:15px}
+.loading{display:none;align-items:center;justify-content:center;height:500px;flex-direction:column;gap:12px;color:#888;font-size:14px}
+.loading.show{display:flex}
+.spinner{width:32px;height:32px;border:3px solid #e0e0e0;border-top:3px solid #1976d2;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.desc-area{display:none}
+.desc-area.show{display:block}
+.desc-title{font-size:16px;font-weight:900;color:#333;margin-bottom:12px;border-bottom:3px solid #e53935;padding-bottom:8px}
+.desc-table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px}
+.desc-table th{background:#e53935;color:#fff;padding:10px 14px;text-align:center;font-weight:700}
+.desc-table th:first-child{width:50px}
+.desc-table th:nth-child(2){width:140px;text-align:left}
+.desc-table th:nth-child(3){text-align:left}
+.desc-table td{padding:10px 14px;border-bottom:1px solid #eee;vertical-align:top;color:#333;line-height:1.6}
+.desc-table td:first-child{text-align:center;font-weight:900;color:#e53935}
+.desc-table td:nth-child(2){font-weight:700}
+.desc-table tr:hover{background:#fbe9e7}
+.tag{display:inline-block;background:#ffebee;color:#c62828;font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px;margin-left:4px}
+.json-title{font-size:16px;font-weight:900;color:#333;margin-bottom:12px;border-bottom:3px solid #e53935;padding-bottom:8px}
+pre{background:#263238;color:#eeffff;padding:20px;border-radius:12px;font-size:13px;line-height:1.7;overflow-x:auto;font-family:monospace}
+.copy-row{display:flex;justify-content:flex-end;margin-bottom:8px}
+.copy-btn{padding:6px 18px;border-radius:8px;border:1px solid #1976d2;background:#fff;color:#1976d2;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .2s}
+.copy-btn.done{background:#1976d2;color:#fff}
+.error-msg{color:#e53935;font-size:13px;font-weight:700;margin-top:8px;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>활동 디스크립션 생성기</h1>
+
+  <div class="sec">
+    <div class="row">
+      <div class="col">
+        <div class="label">와이어프레임 URL</div>
+        <input type="text" class="url-input" id="urlInput" placeholder="https://qukaka8523.github.io/ax-tf/climate-prepare.html">
+      </div>
+      <button class="gen-btn" id="genBtn" onclick="generate()">디스크립션 생성</button>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+
+    <!-- 미리보기 -->
+    <div class="preview-box" id="previewBox">
+      <div class="preview-placeholder" id="placeholder">URL을 입력하고 생성 버튼을 눌러주세요</div>
+      <div class="loading" id="loading"><div class="spinner"></div>화면을 불러오는 중...</div>
+      <iframe id="previewFrame" style="display:none" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+
+    <!-- 디스크립션 -->
+    <div class="desc-area" id="descArea">
+      <div class="desc-title">화면 요소 디스크립션</div>
+      <div class="copy-row"><button class="copy-btn" onclick="copyDesc()">테이블 복사</button></div>
+      <table class="desc-table" id="descTable">
+        <tr><th>No.</th><th>요소명</th><th>설명</th></tr>
+      </table>
+
+      <div class="json-title">데이터 구조 (JSON)</div>
+      <pre id="jsonPre"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='https://api.anthropic.com/v1/messages';
+
+async function generate(){
+  const url=document.getElementById('urlInput').value.trim();
+  const err=document.getElementById('errorMsg');
+  const descArea=document.getElementById('descArea');
+  
+  if(!url){err.textContent='URL을 입력해주세요.';err.style.display='block';return}
+  err.style.display='none';
+
+  // 미리보기 로드
+  document.getElementById('placeholder').style.display='none';
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('previewFrame').style.display='none';
+  descArea.classList.remove('show');
+
+  const frame=document.getElementById('previewFrame');
+  frame.src=url;
+  frame.onload=()=>{
+    document.getElementById('loading').classList.remove('show');
+    frame.style.display='block';
+  };
+  frame.onerror=()=>{
+    document.getElementById('loading').classList.remove('show');
+    err.textContent='URL을 불러올 수 없습니다.';err.style.display='block';
+  };
+
+  // HTML 소스 가져오기
+  try{
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('fetch failed');
+    const html=await res.text();
+    await analyzeWithAI(html,url);
+  }catch(e){
+    // fetch 실패 시 기본 분석
+    await analyzeWithAI(null,url);
+  }
+}
+
+async function analyzeWithAI(html,url){
+  const descArea=document.getElementById('descArea');
+  const table=document.getElementById('descTable');
+  const jsonPre=document.getElementById('jsonPre');
+
+  try{
+    const prompt=html
+      ?`아래 HTML 학습 콘텐츠의 화면 요소를 분석하여 JSON으로 응답하세요.
+
+HTML:
+${html.substring(0,6000)}
+
+응답 형식(JSON만, 다른 텍스트 없이):
+{"elements":[{"no":1,"name":"요소명","desc":"설명(CSS속성, 크기, 색상, 인터랙션 포함)","tags":["정적|인터랙션|애니메이션|반응형|데이터바인딩"]}],"data_structure":[{"field":"필드명","type":"타입","desc":"설명"}]}`
+      :`URL ${url}의 학습 콘텐츠를 분석하여 화면 요소 디스크립션을 JSON으로 응답하세요.
+응답 형식(JSON만):
+{"elements":[{"no":1,"name":"요소명","desc":"설명","tags":["태그"]}],"data_structure":[{"field":"필드명","type":"타입","desc":"설명"}]}`;
+
+    const res=await fetch(API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:2000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+
+    const data=await res.json();
+    const text=data.content.map(i=>i.text||'').join('');
+    const clean=text.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+
+    // 테이블 렌더링
+    table.innerHTML='<tr><th>No.</th><th>요소명</th><th>설명</th></tr>';
+    parsed.elements.forEach(el=>{
+      const tags=(el.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+      table.innerHTML+=`<tr><td>${el.no}</td><td>${el.name}</td><td>${el.desc}${tags}</td></tr>`;
+    });
+
+    // JSON 렌더링
+    jsonPre.textContent=JSON.stringify(parsed.data_structure||parsed,null,2);
+    descArea.classList.add('show');
+
+  }catch(e){
+    // AI 실패 시 기본 분석 표시
+    generateFallback(html,table,jsonPre);
+    descArea.classList.add('show');
+  }
+}
+
+function generateFallback(html,table,jsonPre){
+  const elements=[];
+  let no=1;
+
+  if(html){
+    if(html.includes('inst')||html.includes('안내'))elements.push({no:no++,name:'안내 문구 영역',desc:'학습 활동 안내 텍스트. 체크 아이콘 + 안내 문구로 구성.',tags:['정적']});
+    if(html.includes('card')||html.includes('카드'))elements.push({no:no++,name:'카드 컨테이너',desc:'카드들을 감싸는 플렉스/그리드 컨테이너. perspective 적용.',tags:['반응형']});
+    if(html.includes('flip')||html.includes('rotateY'))elements.push({no:no++,name:'카드 (앞면)',desc:'핵심 키워드가 표시되는 카드 기본 상태. 클릭 시 Y축 180° 회전.',tags:['인터랙션']});
+    if(html.includes('keyword')||html.includes('kw'))elements.push({no:no++,name:'키워드 텍스트',desc:'교과서에서 추출한 핵심 단어. 큰 폰트, 흰색, 중앙 정렬.',tags:['데이터바인딩']});
+    if(html.includes('👆')||html.includes('tap')||html.includes('hi'))elements.push({no:no++,name:'탭 안내 아이콘',desc:'클릭 유도 손가락 아이콘. 바운스 애니메이션. 뒤집힌 후 숨김.',tags:['애니메이션']});
+    if(html.includes('back')||html.includes('cb'))elements.push({no:no++,name:'카드 (뒷면)',desc:'키워드의 정의와 예시가 표시되는 뒷면.',tags:['데이터바인딩']});
+    if(html.includes('definition')||html.includes('df'))elements.push({no:no++,name:'정의 텍스트',desc:'키워드에 대한 핵심 정의. 핵심어 strong 강조.',tags:['데이터바인딩']});
+    if(html.includes('example')||html.includes('ex'))elements.push({no:no++,name:'예시 문장',desc:'"예)" 접두어 + 예시 문장. 회색 배경 박스.',tags:['데이터바인딩']});
+  }
+
+  if(elements.length===0){
+    elements.push({no:1,name:'(분석 필요)',desc:'URL의 HTML 소스를 직접 확인하여 요소를 분석해주세요.',tags:[]});
+  }
+
+  table.innerHTML='<tr><th>No.</th><th>요소명</th><th>설명</th></tr>';
+  elements.forEach(el=>{
+    const tags=el.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+    table.innerHTML+=`<tr><td>${el.no}</td><td>${el.name}</td><td>${el.desc}${tags}</td></tr>`;
+  });
+
+  jsonPre.textContent=JSON.stringify(elements,null,2);
+}
+
+function copyDesc(){
+  const table=document.getElementById('descTable');
+  let text='No.\t요소명\t설명\n';
+  const rows=table.querySelectorAll('tr');
+  for(let i=1;i<rows.length;i++){
+    const cells=rows[i].querySelectorAll('td');
+    text+=`${cells[0].textContent}\t${cells[1].textContent}\t${cells[2].textContent.replace(/\n/g,' ')}\n`;
+  }
+  navigator.clipboard.writeText(text).then(()=>{
+    const b=document.querySelector('.copy-btn');
+    b.textContent='복사됨!';b.classList.add('done');
+    setTimeout(()=>{b.textContent='테이블 복사';b.classList.remove('done')},2000);
+  });
+}
+</script>
+</body>
+</html>
