@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>학습 콘텐츠 프롬프트 생성기</title>
+<title>활동 와이어프레임 프롬프트 생성기</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Sans KR',sans-serif;background:#f5f5f5;min-height:100vh;padding:24px 16px}
 .wrap{max-width:800px;margin:0 auto}
 h1{font-size:22px;font-weight:900;color:#333;text-align:center;margin-bottom:20px}
-.sec{border:2px solid #1976d2;border-radius:12px;padding:20px;margin-bottom:20px;background:#fff}
+.sec{border:2px solid #1976d2;border-radius:12px;padding:24px;background:#fff}
 .sec-title{font-size:15px;font-weight:900;color:#1976d2;margin-bottom:14px}
+.divider{border:none;border-top:1px solid #e0e0e0;margin:20px 0}
 .row{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
 .col{flex:1;min-width:200px}
 .label{font-size:13px;font-weight:700;color:#555;margin-bottom:6px}
@@ -23,14 +24,13 @@ h1{font-size:22px;font-weight:900;color:#333;text-align:center;margin-bottom:20p
 select{padding:8px 14px;border-radius:8px;border:1px solid #ccc;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;appearance:auto}
 .sel-step{background:#e3f2fd;color:#1565c0}
 .sel-type{background:#fff3e0;color:#e65100}
-.preview{display:flex;gap:16px;background:#f5f5f5;border-radius:10px;padding:16px;margin-bottom:16px;flex-wrap:wrap}
-.preview-img{width:200px;height:120px;border-radius:8px;flex-shrink:0;object-fit:cover;background:#e0e0e0}
-.preview-text{flex:1;min-width:200px}
-.preview-text h3{font-size:14px;font-weight:900;color:#333;margin-bottom:6px}
-.preview-text p{font-size:13px;color:#666;line-height:1.6;white-space:pre-line}
+.preview{background:#f5f5f5;border-radius:10px;padding:16px;margin-bottom:0}
+.preview h3{font-size:14px;font-weight:900;color:#333;margin-bottom:6px}
+.preview p{font-size:13px;color:#666;line-height:1.6;white-space:pre-line}
 .ref-input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid #ccc;font-size:13px;font-family:monospace}
 .gen-btn{display:block;margin:0 auto;padding:12px 40px;border-radius:10px;border:2px solid #333;background:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .2s}
 .gen-btn:hover{background:#333;color:#fff}
+.result-sec{margin-top:20px}
 .out-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .copy-btn{padding:6px 18px;border-radius:8px;border:1px solid #1976d2;background:#fff;color:#1976d2;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .2s}
 .copy-btn.done{background:#1976d2;color:#fff}
@@ -40,11 +40,30 @@ pre{background:#f5f5f5;border-radius:10px;padding:16px;font-size:13px;line-heigh
 </head>
 <body>
 <div class="wrap">
-  <h1>학습 콘텐츠 프롬프트 생성기</h1>
+  <h1>활동 와이어프레임 프롬프트 생성기</h1>
 
-  <!-- 입력 -->
   <div class="sec">
-    <div class="sec-title">입력</div>
+    <!-- 인터렉션학습 만들기 -->
+    <div class="sec-title">인터렉션학습 만들기</div>
+    <div class="sel-row">
+      <span>단계명</span>
+      <select id="stepSel" class="sel-step"></select>
+      <span>활동유형명</span>
+      <select id="typeSel" class="sel-type"></select>
+      <span>디자인스타일</span>
+      <select id="styleSel" style="padding:8px 14px;border-radius:8px;border:1px solid #ccc;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;background:#f3e5f5;color:#7b1fa2">
+        <option value="monotone">monotone</option>
+      </select>
+    </div>
+    <div class="preview">
+      <h3 id="prevTitle"></h3>
+      <p id="prevDesc"></p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 자료입력 -->
+    <div class="sec-title">자료입력</div>
     <div class="row">
       <div class="col">
         <div class="label">교과서 (PDF)</div>
@@ -57,37 +76,27 @@ pre{background:#f5f5f5;border-radius:10px;padding:16px;font-size:13px;line-heigh
         <input type="file" id="imgInput" accept="image/*" style="display:none">
       </div>
     </div>
-  </div>
 
-  <!-- 출력 설정 -->
-  <div class="sec">
-    <div class="sec-title">출력</div>
-    <div class="sel-row">
-      <span>단계명</span>
-      <select id="stepSel" class="sel-step"></select>
-      <span>활동유형명</span>
-      <select id="typeSel" class="sel-type"></select>
-    </div>
-    <div class="preview">
-      <div class="preview-text">
-        <h3 id="prevTitle"></h3>
-        <p id="prevDesc"></p>
-      </div>
-    </div>
+    <!-- 참고 HTML -->
     <div style="margin-bottom:16px">
       <div class="label">참고 HTML</div>
       <input type="text" class="ref-input" id="refInput" placeholder="https://example.com/sample.html">
     </div>
-    <button class="gen-btn" onclick="generate()">클로드 프롬프트 생성</button>
-  </div>
-
-  <!-- 결과 -->
-  <div class="sec hidden" id="resultSec">
-    <div class="out-header">
-      <div class="sec-title" style="margin-bottom:0">생성된 프롬프트</div>
-      <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">복사</button>
+    <div style="margin-bottom:20px">
+      <div class="label">추가 프롬프트</div>
+      <textarea id="extraPrompt" placeholder="추가 지시사항을 입력하세요" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #ccc;font-size:13px;font-family:'Noto Sans KR',sans-serif;min-height:80px;resize:vertical"></textarea>
     </div>
-    <pre id="resultPre"></pre>
+    <button class="gen-btn" onclick="generate()">클로드 프롬프트 생성</button>
+
+    <!-- 결과 -->
+    <div class="result-sec hidden" id="resultSec">
+      <hr class="divider">
+      <div class="out-header">
+        <div class="sec-title" style="margin-bottom:0">생성된 프롬프트</div>
+        <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">복사</button>
+      </div>
+      <pre id="resultPre"></pre>
+    </div>
   </div>
 </div>
 
@@ -111,35 +120,26 @@ const DATA={
     "핵심정리카드":"핵심 개념을 카드 형태로 정리하여 넘겨보는 활동",
     "4지선다":"4개 보기 중 정답을 고르는 객관식 퀴즈"
   },
-  thumbs:{
-    "카드뒤집기":"https://qukaka8523.github.io/ax-tf/thumb-card.png",
-    "뚜껑열기(초성)":"https://qukaka8523.github.io/ax-tf/thumb-summary.png",
-    "OX퀴즈":"https://qukaka8523.github.io/ax-tf/thumb-ox.png"
-  },
   refs:{
-    "카드뒤집기":"https://qukaka8523.github.io/ax-tf/climate-prepare.html",
-    "뚜껑열기(초성)":"https://qukaka8523.github.io/ax-tf/climate-summary.html",
-    "OX퀴즈":"https://qukaka8523.github.io/ax-tf/climate-ox-quiz.html"
+    "카드뒤집기":"",
+    "뚜껑열기(초성)":"",
+    "OX퀴즈":""
   }
 };
 
 let pdfName='',imgName='';
 
-// File inputs
 document.getElementById('pdfInput').addEventListener('change',function(e){
   pdfName=e.target.files[0]?.name||'';
   const z=document.getElementById('pdfZone');
-  z.textContent=pdfName||'파일드래그';
-  z.classList.toggle('has',!!pdfName);
+  z.textContent=pdfName||'파일드래그';z.classList.toggle('has',!!pdfName);
 });
 document.getElementById('imgInput').addEventListener('change',function(e){
   imgName=e.target.files[0]?.name||'';
   const z=document.getElementById('imgZone');
-  z.textContent=imgName||'파일드래그';
-  z.classList.toggle('has',!!imgName);
+  z.textContent=imgName||'파일드래그';z.classList.toggle('has',!!imgName);
 });
 
-// Drag & drop
 ['pdfZone','imgZone'].forEach((id,i)=>{
   const z=document.getElementById(id);
   const inp=document.getElementById(i===0?'pdfInput':'imgInput');
@@ -147,43 +147,30 @@ document.getElementById('imgInput').addEventListener('change',function(e){
   z.addEventListener('dragleave',()=>{z.style.borderColor='#bbb'});
   z.addEventListener('drop',e=>{
     e.preventDefault();z.style.borderColor='#bbb';
-    if(e.dataTransfer.files.length){
-      const dt=new DataTransfer();dt.items.add(e.dataTransfer.files[0]);
-      inp.files=dt.files;inp.dispatchEvent(new Event('change'));
-    }
+    if(e.dataTransfer.files.length){const dt=new DataTransfer();dt.items.add(e.dataTransfer.files[0]);inp.files=dt.files;inp.dispatchEvent(new Event('change'))}
   });
 });
 
-// Selects
-const stepSel=document.getElementById('stepSel');
-const typeSel=document.getElementById('typeSel');
-
+const stepSel=document.getElementById('stepSel'),typeSel=document.getElementById('typeSel');
 DATA.steps.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;stepSel.appendChild(o)});
 
 function updateTypes(){
-  const s=stepSel.value;
   typeSel.innerHTML='';
-  DATA.types[s].forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;typeSel.appendChild(o)});
+  DATA.types[stepSel.value].forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;typeSel.appendChild(o)});
   updatePreview();
 }
-
 function updatePreview(){
   const t=typeSel.value;
   document.getElementById('prevTitle').textContent='['+t+']';
   document.getElementById('prevDesc').textContent=DATA.desc[t]||'';
   document.getElementById('refInput').value=DATA.refs[t]||'';
 }
-
 stepSel.addEventListener('change',updateTypes);
 typeSel.addEventListener('change',updatePreview);
 updateTypes();
 
-// Generate
 function generate(){
-  const step=stepSel.value,type=typeSel.value;
-  const ref=document.getElementById('refInput').value;
-  const desc=DATA.desc[type]||'';
-
+  const step=stepSel.value,type=typeSel.value,ref=document.getElementById('refInput').value,desc=DATA.desc[type]||'',extra=document.getElementById('extraPrompt').value.trim(),style=document.getElementById('styleSel').value;
   const prompt=`당신은 초등학교 사회 교과서를 기반으로 학습 콘텐츠 HTML 파일을 제작하는 전문가입니다.
 
 ## 입력 정보
@@ -193,6 +180,7 @@ function generate(){
 ## 제작 요청
 - 학습 단계: ${step}
 - 활동 유형: ${type}
+- 디자인 스타일: ${style}
 
 ## 활동 유형 설명
 ${desc}
@@ -205,24 +193,21 @@ ${desc}
 5. 상단 학습단계 네비게이션, 하단 다음 버튼 등 플랫폼 UI는 포함하지 마세요. 콘텐츠 영역만 제작하세요.
 6. 코드는 간결하고 최대한 짧게 작성하세요.
 7. 모바일/데스크톱 모두 대응하는 반응형으로 제작하세요.
-${ref?`\n## 참고 HTML\n아래 URL의 HTML 구조와 인터랙션을 참고하여 유사한 방식으로 제작하세요:\n${ref}\n`:''}
+${ref?`\n## 참고 HTML\n아래 URL의 HTML 구조와 인터랙션을 참고하여 유사한 방식으로 제작하세요:\n${ref}\n`:''}${extra?`\n## 추가 지시사항\n${extra}\n`:''}
 ## 출력
 - 완성된 HTML 파일 코드를 출력하세요.
 - HTML 파일만 출력하고, 설명은 최소화하세요.`;
 
   document.getElementById('resultPre').textContent=prompt;
   document.getElementById('resultSec').classList.remove('hidden');
-  document.getElementById('copyBtn').textContent='복사';
-  document.getElementById('copyBtn').classList.remove('done');
+  document.getElementById('copyBtn').textContent='복사';document.getElementById('copyBtn').classList.remove('done');
   document.getElementById('resultSec').scrollIntoView({behavior:'smooth'});
 }
 
 function copyPrompt(){
-  const text=document.getElementById('resultPre').textContent;
-  navigator.clipboard.writeText(text).then(()=>{
-    const btn=document.getElementById('copyBtn');
-    btn.textContent='복사됨!';btn.classList.add('done');
-    setTimeout(()=>{btn.textContent='복사';btn.classList.remove('done')},2000);
+  navigator.clipboard.writeText(document.getElementById('resultPre').textContent).then(()=>{
+    const b=document.getElementById('copyBtn');b.textContent='복사됨!';b.classList.add('done');
+    setTimeout(()=>{b.textContent='복사';b.classList.remove('done')},2000);
   });
 }
 </script>
