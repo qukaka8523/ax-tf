@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;width:100vw;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.bg{position:fixed;inset:0;z-index:0}
+.bg svg{width:100%;height:100%}
+.wrap{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:16px 24px}
+.hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px;background:rgba(255,255,255,.85);border-radius:12px;padding:10px 18px}
+.hdr-icon{width:32px;height:32px;background:#ff9800;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer}
+.hdr p{font-size:16px;font-weight:700;color:#333;flex:1}
+.stars{display:flex;gap:3px}
+.star{font-size:20px;color:#e0e0e0}.star.on{color:#ffd54f}.star.cur{color:#ffd54f;opacity:.5}
+.q-card{background:rgba(255,255,255,.92);border-radius:20px;padding:24px 36px;text-align:center;margin:0 auto;max-width:680px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.08);position:relative}
+.q-num{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:#78909c;color:#fff;font-size:12px;font-weight:700;border-radius:12px;padding:3px 14px}
+.q-text{font-size:21px;font-weight:700;color:#333;line-height:1.5}
+.choices{flex:1;display:flex;align-items:center;justify-content:center;gap:28px;padding:16px}
+.choice{width:250px;height:110px;border-radius:18px;border:3px solid #f9a825;background:rgba(255,249,196,.92);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#333;cursor:pointer;transition:all .25s;user-select:none;box-shadow:0 4px 16px rgba(0,0,0,.06);backdrop-filter:blur(4px)}
+.choice:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.choice.correct{border-color:#4caf50;background:rgba(200,230,201,.92);color:#2e7d32}
+.choice.wrong{border-color:#ef5350;background:rgba(255,205,210,.92);color:#c62828;animation:shake .4s}
+.fb-bar{text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;border-radius:12px;margin:0 auto;max-width:680px;width:100%;padding:10px 16px;transition:all .3s;opacity:0}
+.fb-bar.show{opacity:1}.fb-bar.ok{background:rgba(200,230,201,.92);color:#2e7d32}.fb-bar.no{background:rgba(255,205,210,.92);color:#c62828}
+.bot{display:flex;align-items:center;justify-content:center;gap:16px;padding:6px 0}
+.nav-btn{width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;background:#4db6ac;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:all .2s}
+.nav-btn:hover{transform:scale(1.1)}.nav-btn:disabled{background:#bbb;cursor:default;transform:none}
+.result{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s}
+.result.show{opacity:1;pointer-events:auto}
+.res-card{background:#fff;border-radius:24px;padding:36px 44px;text-align:center;transform:scale(.8);transition:transform .3s}
+.result.show .res-card{transform:scale(1)}
+.res-emoji{font-size:56px;margin-bottom:8px}.res-title{font-size:24px;font-weight:900;color:#333;margin-bottom:4px}.res-sub{font-size:14px;color:#888;margin-bottom:18px}
+.res-btn{padding:11px 32px;border:none;border-radius:12px;background:#4db6ac;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style>
+</head>
+<body>
+<!-- 사계절 배경 SVG -->
+<div class="bg">
+<svg viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
+<defs>
+<linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fce4ec"/><stop offset="100%" stop-color="#f8bbd0"/></linearGradient>
+<linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e1f5fe"/><stop offset="100%" stop-color="#b3e5fc"/></linearGradient>
+<linearGradient id="sky3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff3e0"/><stop offset="100%" stop-color="#ffe0b2"/></linearGradient>
+<linearGradient id="sky4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e8eaf6"/><stop offset="100%" stop-color="#c5cae9"/></linearGradient>
+</defs>
+<!-- 4 sky panels -->
+<rect x="0" y="0" width="350" height="800" fill="url(#sky1)"/>
+<rect x="350" y="0" width="350" height="800" fill="url(#sky2)"/>
+<rect x="700" y="0" width="350" height="800" fill="url(#sky3)"/>
+<rect x="1050" y="0" width="350" height="800" fill="url(#sky4)"/>
+<!-- Ground -->
+<path d="M0,520 Q175,480 350,520 Q525,480 700,520 Q875,480 1050,520 Q1225,480 1400,520 L1400,800 L0,800Z" fill="#a5d6a7"/>
+<path d="M0,560 Q175,530 350,560 Q525,530 700,560 Q875,530 1050,560 Q1225,530 1400,560 L1400,800 L0,800Z" fill="#81c784"/>
+<path d="M0,620 Q350,590 700,620 Q1050,590 1400,620 L1400,800 L0,800Z" fill="#66bb6a"/>
+<!-- SPRING: cherry blossom trees -->
+<g>
+<rect x="100" y="380" width="14" height="160" rx="4" fill="#8d6e63"/>
+<rect x="210" y="340" width="12" height="200" rx="4" fill="#795548"/>
+<!-- Canopy blossoms -->
+<circle cx="70" cy="340" r="36" fill="#f48fb1" opacity=".85"/>
+<circle cx="130" cy="320" r="42" fill="#f06292" opacity=".8"/>
+<circle cx="107" cy="360" r="30" fill="#f8bbd0" opacity=".9"/>
+<circle cx="150" cy="355" r="25" fill="#f48fb1" opacity=".75"/>
+<circle cx="190" cy="300" r="38" fill="#f06292" opacity=".8"/>
+<circle cx="240" cy="310" r="34" fill="#f48fb1" opacity=".85"/>
+<circle cx="215" cy="340" r="28" fill="#f8bbd0" opacity=".9"/>
+<!-- Falling petals -->
+<circle cx="60" cy="430" r="4" fill="#f8bbd0" opacity=".6"/>
+<circle cx="140" cy="460" r="3" fill="#f48fb1" opacity=".5"/>
+<circle cx="250" cy="440" r="3.5" fill="#f8bbd0" opacity=".6"/>
+<circle cx="180" cy="490" r="3" fill="#f48fb1" opacity=".4"/>
+<circle cx="300" cy="470" r="4" fill="#f8bbd0" opacity=".5"/>
+</g>
+<!-- SUMMER: lush green trees + sun -->
+<g>
+<circle cx="600" cy="60" r="50" fill="#FFD54F" opacity=".7"/>
+<circle cx="600" cy="60" r="36" fill="#FFECB3" opacity=".9"/>
+<rect x="440" y="370" width="16" height="170" rx="5" fill="#6d4c41"/>
+<rect x="570" y="350" width="14" height="190" rx="5" fill="#795548"/>
+<circle cx="448" cy="310" r="52" fill="#43a047" opacity=".9"/>
+<circle cx="410" cy="340" r="38" fill="#66bb6a" opacity=".85"/>
+<circle cx="488" cy="330" r="44" fill="#388e3c" opacity=".88"/>
+<circle cx="577" cy="290" r="56" fill="#2e7d32" opacity=".9"/>
+<circle cx="540" cy="320" r="40" fill="#43a047" opacity=".85"/>
+<circle cx="620" cy="310" r="46" fill="#388e3c" opacity=".88"/>
+<!-- small clouds -->
+<ellipse cx="430" cy="100" rx="40" ry="16" fill="#fff" opacity=".6"/>
+<ellipse cx="460" cy="95" rx="28" ry="12" fill="#fff" opacity=".5"/>
+</g>
+<!-- AUTUMN: orange/red trees -->
+<g>
+<rect x="790" y="360" width="14" height="180" rx="5" fill="#6d4c41"/>
+<rect x="920" y="340" width="16" height="200" rx="5" fill="#5d4037"/>
+<circle cx="797" cy="310" r="48" fill="#ff8a65" opacity=".9"/>
+<circle cx="760" cy="330" r="36" fill="#ff7043" opacity=".85"/>
+<circle cx="840" cy="320" r="40" fill="#e64a19" opacity=".8"/>
+<circle cx="928" cy="280" r="54" fill="#ff6e40" opacity=".88"/>
+<circle cx="890" cy="310" r="40" fill="#ff8a65" opacity=".85"/>
+<circle cx="970" cy="300" r="42" fill="#bf360c" opacity=".75"/>
+<circle cx="960" cy="340" r="32" fill="#ff7043" opacity=".8"/>
+<!-- Falling leaves -->
+<ellipse cx="780" cy="450" rx="6" ry="4" fill="#ff8a65" opacity=".6" transform="rotate(30,780,450)"/>
+<ellipse cx="870" cy="470" rx="5" ry="3" fill="#e64a19" opacity=".5" transform="rotate(-20,870,470)"/>
+<ellipse cx="950" cy="440" rx="6" ry="4" fill="#ff7043" opacity=".55" transform="rotate(45,950,440)"/>
+<ellipse cx="830" cy="500" rx="5" ry="3" fill="#bf360c" opacity=".5" transform="rotate(-35,830,500)"/>
+</g>
+<!-- WINTER: bare/snowy trees + snow -->
+<g>
+<rect x="1140" y="360" width="14" height="180" rx="4" fill="#8d6e63"/>
+<rect x="1270" y="340" width="12" height="200" rx="4" fill="#795548"/>
+<!-- Bare branches -->
+<line x1="1147" y1="380" x2="1110" y2="320" stroke="#8d6e63" stroke-width="6" stroke-linecap="round"/>
+<line x1="1110" y1="320" x2="1085" y2="280" stroke="#8d6e63" stroke-width="4" stroke-linecap="round"/>
+<line x1="1110" y1="320" x2="1130" y2="270" stroke="#8d6e63" stroke-width="3" stroke-linecap="round"/>
+<line x1="1147" y1="400" x2="1185" y2="330" stroke="#8d6e63" stroke-width="5" stroke-linecap="round"/>
+<line x1="1185" y1="330" x2="1200" y2="285" stroke="#8d6e63" stroke-width="3" stroke-linecap="round"/>
+<line x1="1185" y1="330" x2="1165" y2="280" stroke="#8d6e63" stroke-width="3" stroke-linecap="round"/>
+<line x1="1276" y1="370" x2="1240" y2="300" stroke="#795548" stroke-width="6" stroke-linecap="round"/>
+<line x1="1240" y1="300" x2="1220" y2="260" stroke="#795548" stroke-width="3" stroke-linecap="round"/>
+<line x1="1240" y1="300" x2="1260" y2="250" stroke="#795548" stroke-width="3" stroke-linecap="round"/>
+<line x1="1276" y1="390" x2="1310" y2="310" stroke="#795548" stroke-width="5" stroke-linecap="round"/>
+<line x1="1310" y1="310" x2="1330" y2="270" stroke="#795548" stroke-width="3" stroke-linecap="round"/>
+<!-- Snow on branches -->
+<ellipse cx="1090" cy="278" rx="14" ry="5" fill="#fff" opacity=".8"/>
+<ellipse cx="1130" cy="268" rx="12" ry="4" fill="#eceff1" opacity=".7"/>
+<ellipse cx="1200" cy="283" rx="14" ry="5" fill="#fff" opacity=".8"/>
+<ellipse cx="1222" cy="258" rx="12" ry="4" fill="#eceff1" opacity=".7"/>
+<ellipse cx="1260" cy="248" rx="14" ry="5" fill="#fff" opacity=".8"/>
+<ellipse cx="1330" cy="268" rx="12" ry="4" fill="#eceff1" opacity=".7"/>
+<!-- Snow on ground -->
+<ellipse cx="1200" cy="540" rx="160" ry="20" fill="#fff" opacity=".3"/>
+<ellipse cx="1150" cy="560" rx="120" ry="14" fill="#eceff1" opacity=".25"/>
+<!-- Snowflakes -->
+<circle cx="1100" cy="150" r="3" fill="#fff" opacity=".7"/>
+<circle cx="1180" cy="200" r="2.5" fill="#fff" opacity=".6"/>
+<circle cx="1250" cy="120" r="3" fill="#eceff1" opacity=".7"/>
+<circle cx="1320" cy="180" r="2" fill="#fff" opacity=".65"/>
+<circle cx="1150" cy="250" r="2.5" fill="#fff" opacity=".55"/>
+<circle cx="1300" cy="100" r="3" fill="#eceff1" opacity=".6"/>
+<circle cx="1080" cy="80" r="2" fill="#fff" opacity=".5"/>
+<circle cx="1350" cy="250" r="2.5" fill="#fff" opacity=".55"/>
+<circle cx="1200" cy="60" r="3" fill="#fff" opacity=".6"/>
+</g>
+<!-- Flowers in spring grass -->
+<circle cx="50" cy="560" r="4" fill="#f48fb1"/><circle cx="50" cy="560" r="2" fill="#fff"/>
+<circle cx="130" cy="580" r="4" fill="#f06292"/><circle cx="130" cy="580" r="2" fill="#fff"/>
+<circle cx="280" cy="570" r="3.5" fill="#f48fb1"/><circle cx="280" cy="570" r="1.5" fill="#fff"/>
+<!-- Summer flowers -->
+<circle cx="500" cy="550" r="4" fill="#fff176"/><circle cx="500" cy="550" r="2" fill="#ff8f00"/>
+<circle cx="620" cy="570" r="3.5" fill="#fff176"/><circle cx="620" cy="570" r="1.5" fill="#ff8f00"/>
+</svg>
+</div>
+
+<div class="wrap">
+  <div class="hdr">
+    <div class="hdr-icon">🔊</div>
+    <p>다음 문제에 알맞은 답을 눌러 보세요.</p>
+    <div class="stars" id="stars"></div>
+  </div>
+  <div style="height:6px"></div>
+  <div class="q-card">
+    <div class="q-num" id="qNum">1 / 8</div>
+    <div class="q-text" id="qText"></div>
+  </div>
+  <div class="choices" id="choices"></div>
+  <div class="fb-bar" id="fbBar"></div>
+  <div class="bot">
+    <button class="nav-btn" id="prevBtn" onclick="go(-1)" disabled>◀</button>
+    <button class="nav-btn" id="nextBtn" onclick="go(1)" disabled>▶</button>
+  </div>
+</div>
+
+<div class="result" id="result">
+  <div class="res-card">
+    <div class="res-emoji" id="resEmoji"></div>
+    <div class="res-title" id="resTitle"></div>
+    <div class="res-sub" id="resSub"></div>
+    <button class="res-btn" onclick="restart()">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QS=[
+  {q:'짧은 시간 동안의 대기 상태를 기후라고 한다.',a:'X',exp:'짧은 시간 동안의 대기 상태는 "날씨"입니다. 기후는 오랜 기간의 평균적인 대기 상태예요.'},
+  {q:'기후는 기온, 강수, 바람 등으로 알 수 있다.',a:'O',exp:'맞아요! 기온, 강수, 바람은 기후를 이루는 구성 요소입니다.'},
+  {q:'여름에는 북서쪽에서 차갑고 건조한 바람이 분다.',a:'X',exp:'북서쪽에서 차갑고 건조한 바람이 부는 것은 겨울이에요. 여름에는 남쪽에서 습한 바람이 불어옵니다.'},
+  {q:'우리나라는 봄, 여름, 가을, 겨울의 사계절이 뚜렷하다.',a:'O',exp:'맞아요! 사계절이 뚜렷한 것이 우리나라 기후의 대표적인 특징입니다.'},
+  {q:'겨울에는 남쪽과 북쪽의 기온 차이가 여름보다 작다.',a:'X',exp:'겨울에 남북 기온 차이가 더 큽니다. 여름에는 전국적으로 고르게 덥지만, 겨울에는 북쪽이 훨씬 추워요.'},
+  {q:'우리나라는 여름에 연 강수량의 절반 이상이 내린다.',a:'O',exp:'맞아요! 여름에 남쪽 바다에서 습한 바람이 불어와 비가 많이 내립니다.'},
+  {q:'남쪽으로 갈수록 기온이 낮아진다.',a:'X',exp:'남쪽으로 갈수록 기온이 높아지고, 북쪽으로 갈수록 기온이 낮아집니다.'},
+  {q:'기온이 높고 강수량이 많은 지역에서는 벼농사가 활발하다.',a:'O',exp:'맞아요! 따뜻하고 비가 많은 지역에서 벼농사가 발달합니다.'}
+];
+let cur=0,score=0,answers=new Array(QS.length).fill(null);
+
+function render(){
+  const q=QS[cur];
+  document.getElementById('qNum').textContent=`${cur+1} / ${QS.length}`;
+  document.getElementById('qText').textContent=q.q;
+  const st=document.getElementById('stars');st.innerHTML='';
+  for(let i=0;i<QS.length;i++){const s=document.createElement('span');s.className='star'+(answers[i]===true?' on':i===cur?' cur':'');s.textContent='★';st.appendChild(s)}
+  const ch=document.getElementById('choices');ch.innerHTML='';
+  ['O','X'].forEach(v=>{
+    const d=document.createElement('div');d.className='choice';d.textContent=v;
+    if(answers[cur]!==null){d.style.cursor='default';if(v===q.a)d.classList.add('correct');else if(v!==q.a&&((answers[cur]===true&&v===q.a)||(answers[cur]!==true&&v===answers[cur])))d.classList.add('wrong')}
+    d.addEventListener('click',()=>pick(v));ch.appendChild(d);
+  });
+  // re-mark wrong
+  if(answers[cur]!==null&&answers[cur]!==true){
+    ch.querySelectorAll('.choice').forEach(c=>{if(c.textContent===answers[cur])c.classList.add('wrong')});
+  }
+  const fb=document.getElementById('fbBar');
+  if(answers[cur]!==null){const ok=answers[cur]===true;fb.className='fb-bar show '+(ok?'ok':'no');fb.textContent=(ok?'⭕ 정답! ':'❌ 오답! ')+q.exp}
+  else{fb.className='fb-bar';fb.textContent=''}
+  document.getElementById('prevBtn').disabled=cur===0;
+  document.getElementById('nextBtn').disabled=answers[cur]===null;
+}
+
+function pick(v){
+  if(answers[cur]!==null)return;
+  const ok=v===QS[cur].a;answers[cur]=ok?true:v;if(ok)score++;render();
+  if(cur<QS.length-1)setTimeout(()=>go(1),1500);
+  else setTimeout(showResult,1200);
+}
+function go(d){const n=cur+d;if(n<0||n>=QS.length)return;cur=n;render()}
+function showResult(){
+  const pct=Math.round(score/QS.length*100);
+  document.getElementById('resEmoji').textContent=pct>=80?'🎉':pct>=50?'👍':'💪';
+  document.getElementById('resTitle').textContent=`${score} / ${QS.length} 정답! (${pct}점)`;
+  document.getElementById('resSub').textContent=pct>=80?'기후 박사가 될 수 있어요!':pct>=50?'조금만 더 복습하면 완벽!':'교과서를 다시 살펴보아요!';
+  document.getElementById('result').classList.add('show');
+}
+function restart(){cur=0;score=0;answers=new Array(QS.length).fill(null);document.getElementById('result').classList.remove('show');render()}
+render();
+document.querySelector('.hdr-icon').addEventListener('click',()=>{if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(QS[cur].q);u.lang='ko-KR';u.rate=.9;speechSynthesis.speak(u)});
+</script>
+</body>
+</html>
