@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>활동 와이어프레임 생성기</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#f5f5f5;min-height:100vh;padding:24px 16px}
+.wrap{max-width:840px;margin:0 auto}
+h1{font-size:22px;font-weight:900;color:#333;text-align:center;margin-bottom:24px}
+.sec{border:2px solid #1976d2;border-radius:12px;padding:24px;background:#fff;margin-bottom:20px}
+.sec-title{font-size:15px;font-weight:900;color:#1976d2;margin-bottom:14px}
+.divider{border:none;border-top:1px solid #e0e0e0;margin:20px 0}
+.row{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.col{flex:1;min-width:200px}
+.label{font-size:13px;font-weight:700;color:#555;margin-bottom:6px}
+.drop-zone{border:2px dashed #bbb;border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;background:#fafafa;font-size:14px;color:#999;transition:all .2s}
+.drop-zone.has{color:#333;border-color:#1976d2;background:#e3f2fd}
+.drop-zone:hover{border-color:#1976d2;background:#e3f2fd}
+.sel-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.sel-row span{font-size:14px;font-weight:700;color:#555}
+select{padding:8px 14px;border-radius:8px;border:1px solid #ccc;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer}
+.sel-step{background:#e3f2fd;color:#1565c0}
+.sel-type{background:#fff3e0;color:#e65100}
+.sel-style{background:#f3e5f5;color:#7b1fa2}
+.preview{background:#f5f5f5;border-radius:10px;padding:16px}
+.preview h3{font-size:14px;font-weight:900;color:#333;margin-bottom:6px}
+.preview p{font-size:13px;color:#666;line-height:1.6;white-space:pre-line}
+.ref-input,.extra-input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid #ccc;font-size:13px;font-family:monospace}
+.extra-input{font-family:'Noto Sans KR',sans-serif;height:80px;resize:vertical}
+.gen-btn{display:block;margin:0 auto;padding:14px 48px;border-radius:10px;border:none;background:#1976d2;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .2s}
+.gen-btn:hover{background:#1565c0}
+.gen-btn:disabled{background:#bbb;cursor:default}
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.result-actions{display:flex;gap:8px}
+.act-btn{padding:6px 16px;border-radius:8px;border:1px solid #ccc;background:#fff;color:#555;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .2s}
+.act-btn:hover{background:#f5f5f5}
+.act-btn.primary{border-color:#1976d2;color:#1976d2}
+.act-btn.done{background:#1976d2;color:#fff;border-color:#1976d2}
+.wf-frame{width:100%;aspect-ratio:16/9;border:1px solid #e0e0e0;border-radius:10px;background:#fff;overflow:hidden;position:relative}
+.wf-frame iframe{width:100%;height:100%;border:none}
+.num-overlay{position:absolute;inset:0;pointer-events:none;z-index:10}
+.num-badge{position:absolute;width:28px;height:28px;background:#1976d2;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;color:#888}
+.spinner{width:40px;height:40px;border:4px solid #e0e0e0;border-top-color:#1976d2;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.desc-sec{border:2px solid #7b1fa2;border-radius:12px;padding:24px;background:#fff;margin-top:20px}
+.desc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.desc-title{font-size:15px;font-weight:900;color:#7b1fa2}
+.desc-table{width:100%;border-collapse:collapse;font-size:13px}
+.desc-table th{background:#f3e5f5;color:#4a148c;padding:10px 14px;text-align:left;font-weight:700;border-bottom:2px solid #ce93d8}
+.desc-table td{padding:10px 14px;border-bottom:1px solid #e0e0e0;color:#333;vertical-align:top;line-height:1.5}
+.desc-table tr:last-child td{border-bottom:none}
+.desc-table .no-cell{width:50px;text-align:center;font-weight:700;color:#7b1fa2}
+.desc-table .name-cell{width:140px;font-weight:700}
+.desc-json{margin-top:16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:10px;padding:16px;max-height:300px;overflow:auto}
+.desc-json pre{font-size:12px;line-height:1.6;color:#333;white-space:pre-wrap;word-break:break-word;font-family:monospace}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>활동 와이어프레임 생성기</h1>
+
+  <div class="sec">
+    <div class="sec-title">인터렉션학습 만들기</div>
+
+    <!-- 1줄: 활동유형명 + 세부옵션 -->
+    <div class="sel-row">
+      <span>활동유형명</span>
+      <select id="typeSel" class="sel-type">
+        <option value="카드뒤집기">카드뒤집기</option>
+        <option value="뚜껑열기(초성)+AI더빙">뚜껑열기(초성)+AI더빙</option>
+      </select>
+      <span id="cardCountLabel">카드개수</span>
+      <select id="cardCountSel" class="sel-step">
+        <option value="auto" selected>자동</option>
+        <option value="2">2개</option>
+        <option value="3">3개</option>
+        <option value="4">4개</option>
+      </select>
+      <span id="sectionCountLabel" class="hidden">정리항목</span>
+      <select id="sectionCountSel" class="sel-step hidden">
+        <option value="auto" selected>자동</option>
+        <option value="2">2개</option>
+        <option value="3">3개</option>
+        <option value="4">4개</option>
+        <option value="5">5개</option>
+      </select>
+    </div>
+
+    <!-- 2줄: 디자인스타일 + 제목크기 + 본문크기 -->
+    <div class="sel-row">
+      <span>디자인스타일</span>
+      <select id="styleSel" class="sel-style">
+        <option value="monotone">monotone</option>
+      </select>
+      <span>제목크기</span>
+      <select id="titleSize" class="sel-style" style="width:80px">
+        <option value="12px" selected>12px</option>
+        <option value="14px">14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+        <option value="20px">20px</option>
+        <option value="24px">24px</option>
+        <option value="28px">28px</option>
+        <option value="32px">32px</option>
+      </select>
+      <span>본문크기</span>
+      <select id="bodySize" class="sel-style" style="width:80px">
+        <option value="12px" selected>12px</option>
+        <option value="13px">13px</option>
+        <option value="14px">14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+        <option value="20px">20px</option>
+      </select>
+    </div>
+
+    <!-- 설명 미리보기 -->
+    <div class="preview">
+      <h3 id="prevTitle">[카드뒤집기]</h3>
+      <p id="prevDesc"></p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 자료입력 -->
+    <div class="sec-title">자료입력</div>
+    <div class="row">
+      <div class="col">
+        <div class="label">교과서 (PDF)</div>
+        <div class="drop-zone" id="pdfZone" onclick="document.getElementById('pdfInput').click()">파일드래그</div>
+        <input type="file" id="pdfInput" accept=".pdf" style="display:none">
+      </div>
+      <div class="col">
+        <div class="label">이미지샘플 (jpg/png)</div>
+        <div class="drop-zone" id="imgZone" onclick="document.getElementById('imgInput').click()">파일드래그</div>
+        <input type="file" id="imgInput" accept="image/*" style="display:none">
+      </div>
+    </div>
+
+    <!-- 참고 HTML -->
+    <div style="margin-bottom:14px">
+      <div class="label">참고 HTML</div>
+      <input type="text" class="ref-input" id="refInput" placeholder="https://example.com/sample.html">
+    </div>
+
+    <!-- 추가 프롬프트 -->
+    <div style="margin-bottom:20px">
+      <div class="label">추가 프롬프트</div>
+      <textarea class="extra-input" id="extraInput" placeholder="추가로 반영할 요구사항을 입력하세요 (선택사항)"></textarea>
+    </div>
+
+    <button class="gen-btn" id="genBtn" onclick="generateWireframe()">와이어프레임 만들기</button>
+  </div>
+
+  <!-- 와이어프레임 결과 -->
+  <div class="sec hidden" id="resultSec">
+    <div class="result-header">
+      <div class="sec-title" style="margin-bottom:0">와이어프레임</div>
+      <div class="result-actions">
+        <button class="act-btn" id="codeToggle" onclick="toggleCode()">html코드보기</button>
+        <button class="act-btn primary" id="copyBtn" onclick="copyCode()">html복사</button>
+        <button class="act-btn primary" id="dlBtn" onclick="downloadHtml()">html다운로드</button>
+      </div>
+    </div>
+    <div class="wf-frame" id="wfFrame">
+      <div class="loading" id="loadingView">
+        <div class="spinner"></div>
+        <div>와이어프레임을 생성하고 있습니다...</div>
+      </div>
+      <div class="num-overlay" id="numOverlay"></div>
+    </div>
+    <div style="display:none" id="codeBox"><pre id="codePre" style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:10px;padding:16px;margin-top:12px;font-size:12px;line-height:1.6;max-height:300px;overflow:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace"></pre></div>
+    <div style="text-align:center;margin-top:16px">
+      <button class="gen-btn" id="descBtn" onclick="generateDesc()" style="background:#7b1fa2">디스크립션 만들기</button>
+    </div>
+  </div>
+
+  <!-- 디스크립션 -->
+  <div class="desc-sec hidden" id="descSec">
+    <div class="desc-header">
+      <div class="desc-title">화면 요소 디스크립션</div>
+      <button class="act-btn" style="border-color:#7b1fa2;color:#7b1fa2" id="copyDescBtn" onclick="copyDesc()">복사</button>
+    </div>
+    <div id="descLoading" style="text-align:center;padding:20px;color:#888;display:none">
+      <div class="spinner" style="margin:0 auto 12px"></div>
+      디스크립션을 생성하고 있습니다...
+    </div>
+    <table class="desc-table" id="descTable" style="display:none">
+      <thead><tr><th class="no-cell">No.</th><th class="name-cell">요소명</th><th>설명</th></tr></thead>
+      <tbody id="descBody"></tbody>
+    </table>
+    <div class="desc-json hidden" id="descJson"><div style="font-size:13px;font-weight:700;color:#555;margin-bottom:8px">데이터 구조 (JSON)</div><pre id="descJsonPre"></pre></div>
+  </div>
+</div>
+
+<script>
+/* ===== 데이터 ===== */
+const DESC={
+  "카드뒤집기":"첨부된 교과서 학습내용 중 핵심단어를 3개 추출하여 카드로 제공 (추가 프롬프트에서 개수 지정 시 해당 개수에 맞춤)\n각 카드를 클릭하면 뒤집어지면서 핵심단어에 대한 설명을 볼 수 있음\n\n[필수 레이아웃 규칙]\n- body: width:100vw; height:100vh; overflow:hidden; margin:0; padding:0;\n- 모든 요소가 100vh 안에 들어와야 하며, 위아래로 잘리거나 스크롤이 생기면 안 됨\n- 상단 안내문구 + 카드 영역을 flex column으로 배치하고, 카드 영역에 flex:1을 주어 남은 공간을 채움\n- 카드 높이는 고정px 대신 flex:1 또는 퍼센트(%)로 지정하여 화면에 맞게 자동 조절\n- 4개 이하: 가로 한 줄 배치 / 5개 이상: 가로 3개씩 여러 줄 배치\n- 카드 뒷면 내용도 잘리지 않도록 font-size를 작게 조절",
+  "뚜껑열기(초성)+AI더빙":"교과서 내용을 표로 정리하고 중요 단어는 초성으로 가린 뚜껑열기\n클릭하면 정답이 공개되며 카운터로 진행률 표시\n상단에 TTS 오디오 플레이어를 배치하여 내용을 음성으로 읽어줌"
+};
+const REFS={
+  "카드뒤집기":"https://qukaka8523.github.io/ax-tf/climate-prepare.html",
+  "뚜껑열기(초성)+AI더빙":"https://qukaka8523.github.io/ax-tf/climate-summary.html"
+};
+
+let pdfName='',imgName='',pdfData=null,imgData=null,generatedHtml='';
+
+/* ===== 활동유형 변경 ===== */
+const typeSel=document.getElementById('typeSel');
+
+function updatePreview(){
+  const t=typeSel.value;
+  document.getElementById('prevTitle').textContent='['+t+']';
+  document.getElementById('prevDesc').textContent=DESC[t]||'';
+  document.getElementById('refInput').value=REFS[t]||'';
+  const isCard=t==='카드뒤집기';
+  const isLid=t==='뚜껑열기(초성)+AI더빙';
+  document.getElementById('cardCountLabel').classList.toggle('hidden',!isCard);
+  document.getElementById('cardCountSel').classList.toggle('hidden',!isCard);
+  document.getElementById('sectionCountLabel').classList.toggle('hidden',!isLid);
+  document.getElementById('sectionCountSel').classList.toggle('hidden',!isLid);
+}
+typeSel.addEventListener('change',updatePreview);
+updatePreview();
+
+/* ===== 파일 입력 ===== */
+document.getElementById('pdfInput').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  pdfName=f.name;
+  const z=document.getElementById('pdfZone');z.textContent=pdfName;z.classList.add('has');
+  const r=new FileReader();r.onload=()=>{pdfData=r.result.split(',')[1]};r.readAsDataURL(f);
+});
+document.getElementById('imgInput').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  imgName=f.name;
+  const z=document.getElementById('imgZone');z.textContent=imgName;z.classList.add('has');
+  const r=new FileReader();r.onload=()=>{imgData=r.result.split(',')[1]};r.readAsDataURL(f);
+});
+['pdfZone','imgZone'].forEach((id,i)=>{
+  const z=document.getElementById(id);
+  const inp=document.getElementById(i===0?'pdfInput':'imgInput');
+  z.addEventListener('dragover',e=>{e.preventDefault();z.style.borderColor='#1976d2'});
+  z.addEventListener('dragleave',()=>{z.style.borderColor='#bbb'});
+  z.addEventListener('drop',e=>{
+    e.preventDefault();z.style.borderColor='#bbb';
+    if(e.dataTransfer.files.length){const dt=new DataTransfer();dt.items.add(e.dataTransfer.files[0]);inp.files=dt.files;inp.dispatchEvent(new Event('change'))}
+  });
+});
+
+/* ===== 와이어프레임 생성 ===== */
+async function generateWireframe(){
+  const btn=document.getElementById('genBtn');
+  btn.disabled=true;btn.textContent='생성 중...';
+
+  // 초기화
+  const resultSec=document.getElementById('resultSec');
+  resultSec.classList.remove('hidden');
+  document.getElementById('loadingView').style.display='flex';
+  document.getElementById('wfFrame').querySelector('iframe')?.remove();
+  document.getElementById('numOverlay').innerHTML='';
+  document.getElementById('codeBox').style.display='none';
+  document.getElementById('descSec').classList.add('hidden');
+  document.getElementById('descBody').innerHTML='';
+  document.getElementById('descJson').classList.add('hidden');
+  resultSec.scrollIntoView({behavior:'smooth'});
+
+  const type=typeSel.value;
+  const style=document.getElementById('styleSel').value;
+  const titleSize=document.getElementById('titleSize').value;
+  const bodySize=document.getElementById('bodySize').value;
+  const ref=document.getElementById('refInput').value;
+  const extra=document.getElementById('extraInput').value.trim();
+  const cardCount=document.getElementById('cardCountSel').value;
+  const sectionCount=document.getElementById('sectionCountSel').value;
+  const desc=(DESC[type]||'').replace('3개',cardCount+'개');
+
+  const sysPrompt=`당신은 초등학교 사회 교과서를 기반으로 학습 콘텐츠 HTML 파일을 제작하는 전문가입니다.
+완성된 HTML 코드만 출력하세요. 설명, 마크다운 백틱, 코드블록 표시 없이 순수 HTML만 출력하세요.
+
+## 제작 규칙
+1. 첨부된 교과서 PDF의 핵심 내용을 분석하여 학습 콘텐츠를 제작하세요.
+2. 첨부된 이미지 샘플의 디자인 스타일을 참고하세요.
+3. 디자인 스타일: "${style}" — 단색 계열의 깔끔한 톤.
+4. 폰트 크기: 타이틀/키워드 ${titleSize}, 본문/설명 ${bodySize}
+5. 단일 HTML 파일, 외부 라이브러리 없이 동작.
+6. 폰트: Google Fonts 'Noto Sans KR'.
+7. 플랫폼 UI(상단 네비, 하단 버튼) 제외. 콘텐츠만.
+8. 간결한 코드. 반응형.
+${ref?'\n참고 HTML: '+ref:''}`;
+
+  const userContent=[];
+  if(pdfData) userContent.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:pdfData}});
+  if(imgData){
+    const mt=imgName.toLowerCase().endsWith('.png')?'image/png':'image/jpeg';
+    userContent.push({type:'image',source:{type:'base64',media_type:mt,data:imgData}});
+  }
+  userContent.push({type:'text',text:`활동 유형: ${type}${type==='카드뒤집기'?(cardCount==='auto'?'\n카드 개수: 교과서 내용에서 적절한 개수를 자동 판단하여 2~4개 생성':'\n카드 개수: '+cardCount+'개'):''}${type==='뚜껑열기(초성)+AI더빙'?(sectionCount==='auto'?'\n정리 항목 개수: 교과서 내용에서 적절한 개수를 자동 판단':'\n정리 항목 개수: '+sectionCount+'개'):''}\n\n활동 유형 설명:\n${desc}${extra?'\n\n추가 요구사항:\n'+extra:''}\n\n위 내용을 기반으로 완성된 HTML 파일을 출력하세요. <!DOCTYPE html>로 시작하세요.`});
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:8000,system:sysPrompt,messages:[{role:'user',content:userContent}]})
+    });
+    const data=await res.json();
+    let html=data.content?.map(c=>c.text||'').join('')||'';
+    html=html.replace(/^```html?\s*/i,'').replace(/```\s*$/,'').trim();
+    generatedHtml=html;
+    showResult(html);
+  }catch(err){
+    document.getElementById('loadingView').innerHTML='<div style="color:#c62828;font-size:15px;font-weight:700">오류: '+err.message+'</div>';
+  }
+  btn.disabled=false;btn.textContent='와이어프레임 만들기';
+}
+
+function showResult(html){
+  document.getElementById('loadingView').style.display='none';
+  const iframe=document.createElement('iframe');
+  iframe.style.cssText='width:100%;height:100%;border:none';
+  document.getElementById('wfFrame').appendChild(iframe);
+  iframe.contentDocument.open();iframe.contentDocument.write(html);iframe.contentDocument.close();
+  document.getElementById('codePre').textContent=html;
+}
+
+function toggleCode(){
+  const box=document.getElementById('codeBox');
+  const btn=document.getElementById('codeToggle');
+  if(box.style.display==='none'){box.style.display='block';btn.textContent='html코드숨기기'}
+  else{box.style.display='none';btn.textContent='html코드보기'}
+}
+function copyCode(){
+  navigator.clipboard.writeText(generatedHtml).then(()=>{
+    const b=document.getElementById('copyBtn');b.textContent='복사됨!';b.classList.add('done');
+    setTimeout(()=>{b.textContent='html복사';b.classList.remove('done')},2000);
+  });
+}
+function downloadHtml(){
+  const blob=new Blob([generatedHtml],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=typeSel.value+'-wireframe.html';a.click();URL.revokeObjectURL(a.href);
+}
+
+/* ===== 디스크립션 생성 ===== */
+async function generateDesc(){
+  const btn=document.getElementById('descBtn');
+  btn.disabled=true;btn.textContent='생성 중...';
+  const descSec=document.getElementById('descSec');
+  descSec.classList.remove('hidden');
+  document.getElementById('descLoading').style.display='block';
+  document.getElementById('descTable').style.display='none';
+  document.getElementById('descJson').classList.add('hidden');
+  document.getElementById('numOverlay').innerHTML='';
+  descSec.scrollIntoView({behavior:'smooth'});
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:4000,
+        system:`당신은 학습 콘텐츠 기획자입니다. HTML 와이어프레임을 분석하여 화면 요소 디스크립션을 JSON으로 출력하세요.
+반드시 아래 JSON 형식만 출력하세요. 마크다운 백틱, 설명 없이 순수 JSON만 출력하세요.
+{"elements":[{"no":1,"name":"요소명","desc":"설명","x":0.1,"y":0.05}],"data":[]}
+규칙:
+- elements: 주요 UI 요소 7~12개
+- no: 번호(1부터)
+- name: 요소명
+- desc: 역할/스타일/인터랙션 한 문장 + 태그(정적/인터랙션/애니메이션/데이터바인딩)
+- x,y: 위치 0~1 비율(좌상단 기준)
+- data: 콘텐츠 데이터 JSON 배열`,
+        messages:[{role:'user',content:'아래 HTML의 화면 요소 디스크립션을 JSON으로 출력하세요.\n\n'+generatedHtml}]
+      })
+    });
+    const data=await res.json();
+    let raw=data.content?.map(c=>c.text||'').join('')||'';
+    raw=raw.replace(/^```json?\s*/i,'').replace(/```\s*$/,'').trim();
+    const parsed=JSON.parse(raw);
+
+    // 번호 배지 (겹침 방지)
+    const overlay=document.getElementById('numOverlay');
+    const placed=[];
+    parsed.elements.forEach(el=>{
+      let px=el.x*100, py=el.y*100;
+      // 겹침 검사 및 밀어내기
+      let tries=0;
+      while(tries<20){
+        let overlap=false;
+        for(const p of placed){
+          if(Math.abs(px-p.x)<4&&Math.abs(py-p.y)<4){overlap=true;break}
+        }
+        if(!overlap)break;
+        px+=4; if(px>92){px=el.x*100;py+=5}
+        if(py>92)py=el.y*100-5;
+        tries++;
+      }
+      placed.push({x:px,y:py});
+      const b=document.createElement('div');b.className='num-badge';b.textContent=el.no;
+      b.style.left=px+'%';b.style.top=py+'%';overlay.appendChild(b);
+    });
+    // 테이블
+    const tbody=document.getElementById('descBody');tbody.innerHTML='';
+    parsed.elements.forEach(el=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td class="no-cell">'+el.no+'</td><td class="name-cell">'+el.name+'</td><td>'+el.desc+'</td>';
+      tbody.appendChild(tr);
+    });
+    document.getElementById('descLoading').style.display='none';
+    document.getElementById('descTable').style.display='table';
+    if(parsed.data&&parsed.data.length){
+      document.getElementById('descJsonPre').textContent=JSON.stringify(parsed.data,null,2);
+      document.getElementById('descJson').classList.remove('hidden');
+    }
+  }catch(err){
+    document.getElementById('descLoading').innerHTML='<div style="color:#c62828">오류: '+err.message+'</div>';
+  }
+  btn.disabled=false;btn.textContent='디스크립션 만들기';
+}
+
+function copyDesc(){
+  const rows=document.querySelectorAll('#descBody tr');
+  let text='No.\t요소명\t설명\n';
+  rows.forEach(r=>{const c=r.querySelectorAll('td');text+=c[0].textContent+'\t'+c[1].textContent+'\t'+c[2].textContent+'\n'});
+  navigator.clipboard.writeText(text).then(()=>{
+    const b=document.getElementById('copyDescBtn');b.textContent='복사됨!';b.style.background='#7b1fa2';b.style.color='#fff';
+    setTimeout(()=>{b.textContent='복사';b.style.background='#fff';b.style.color='#7b1fa2'},2000);
+  });
+}
+</script>
+</body>
+</html>
