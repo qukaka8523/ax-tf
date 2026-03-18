@@ -1,0 +1,379 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>뚜껑열기 - 와이어프레임+디스크립션</title><style>@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap");*{margin:0;padding:0;box-sizing:border-box}body{font-family:"Noto Sans KR",sans-serif;background:#f5f5f5;padding:32px}.wrap{max-width:1200px;margin:0 auto}.section{background:#fff;border-radius:12px;padding:32px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.08)}.section-title{font-size:18px;font-weight:900;margin-bottom:16px}.wf-title{color:#1976d2}.desc-title{color:#7b1fa2}.wf-container{width:100%;aspect-ratio:2000/1200;border:1px solid #e0e0e0;border-radius:10px;overflow:hidden}table{width:100%;border-collapse:collapse;font-size:14px}th{background:#f3e5f5;color:#4a148c;padding:12px 16px;text-align:left;font-weight:700;border-bottom:2px solid #ce93d8}td{padding:12px 16px;border-bottom:1px solid #e0e0e0;color:#333;vertical-align:top;line-height:1.6}tr:last-child td{border-bottom:none}.no{width:50px;text-align:center;font-weight:700;color:#7b1fa2}.name{width:150px;font-weight:700}.meta{font-size:13px;color:#888;margin-bottom:20px}</style></head><body><div class="wrap"><div class="section"><div class="section-title wf-title">와이어프레임</div><div class="meta">활동유형: 뚜껑열기(초성)+AI더빙 | 생성일: 2026. 3. 19.</div><div class="wf-container"><iframe style="width:2000px;height:1200px;border:none;transform-origin:0 0;transform:scale(0.55)" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ko&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=2000&quot;&gt;
+&lt;title&gt;기후가 무엇인지 알아볼까요&lt;/title&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  width: 2000px;
+  min-height: 1200px;
+  height: auto;
+  background: linear-gradient(135deg, #e3f2fd 0%, #fff9e6 50%, #ffe8f0 100%);
+  padding: 80px 100px;
+  overflow: visible;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.header h1 {
+  font-size: 68px;
+  font-weight: 900;
+  color: #7b1fa2;
+  margin-bottom: 20px;
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+}
+
+.audio-player {
+  background: white;
+  border-radius: 30px;
+  padding: 30px 50px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  display: inline-flex;
+  align-items: center;
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.play-btn {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.play-btn:hover {
+  transform: scale(1.1);
+}
+
+.play-btn::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 20px solid white;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  margin-left: 5px;
+}
+
+.play-btn.playing::after {
+  border-left: 8px solid white;
+  border-right: 8px solid white;
+  border-top: 0;
+  border-bottom: 0;
+  width: 20px;
+  height: 24px;
+  margin-left: 0;
+}
+
+.audio-info {
+  font-size: 26px;
+  color: #555;
+  font-weight: 500;
+}
+
+.counter {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  padding: 20px 45px;
+  border-radius: 50px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin-left: 30px;
+}
+
+.section {
+  background: white;
+  border-radius: 40px;
+  padding: 60px;
+  margin-bottom: 50px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.section h2 {
+  font-size: 48px;
+  font-weight: 800;
+  color: #1565c0;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 5px solid #bbdefb;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+
+th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 32px;
+  font-weight: 700;
+  padding: 30px;
+  border: 3px solid #e0e0e0;
+}
+
+td {
+  padding: 35px 40px;
+  font-size: 28px;
+  line-height: 1.8;
+  border: 3px solid #e0e0e0;
+  color: #333;
+}
+
+.lid {
+  background: #ffc107;
+  color: #333;
+  padding: 8px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 700;
+  transition: all 0.3s;
+  font-size: 30px;
+}
+
+.lid:hover {
+  background: #ffb300;
+  transform: translateY(-2px);
+}
+
+.lid.opened {
+  background: #81c784;
+  color: white;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li {
+  margin: 15px 0;
+  padding-left: 40px;
+  position: relative;
+}
+
+li::before {
+  content: '•';
+  position: absolute;
+  left: 15px;
+  color: #7b1fa2;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.highlight {
+  background: linear-gradient(transparent 60%, #fff59d 60%);
+  font-weight: 700;
+  padding: 2px 6px;
+}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;header&quot;&gt;
+  &lt;h1&gt;🌤️ 기후가 무엇인지 알아볼까요&lt;/h1&gt;
+  &lt;div class=&quot;audio-player&quot;&gt;
+    &lt;button class=&quot;play-btn&quot; id=&quot;playBtn&quot;&gt;&lt;/button&gt;
+    &lt;span class=&quot;audio-info&quot;&gt;AI 음성으로 듣기&lt;/span&gt;
+    &lt;span class=&quot;counter&quot;&gt;&lt;span id=&quot;count&quot;&gt;0&lt;/span&gt; / &lt;span id=&quot;total&quot;&gt;0&lt;/span&gt;&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+  &lt;h2&gt;1. 기후의 의미와 특징&lt;/h2&gt;
+  &lt;table&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;width: 250px;&quot;&gt;구분&lt;/th&gt;
+      &lt;th&gt;내용&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;의미&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;span class=&quot;lid&quot;&gt;오랜 기간&lt;/span&gt; 한 지역에서 나타나는 평균적이며 종합적인 대기 상태&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;구성 요소&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;
+        &lt;ul&gt;
+          &lt;li&gt;기온: 공기의 따뜻하고 차가운 정도&lt;/li&gt;
+          &lt;li&gt;&lt;span class=&quot;lid&quot;&gt;강수&lt;/span&gt;: 눈, 비 등 땅에 내린 물&lt;/li&gt;
+          &lt;li&gt;바람: 공기가 움직이는 현상&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;사계&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;
+        &lt;ul&gt;
+          &lt;li&gt;봄, 여름, 가을, 겨울의 &lt;span class=&quot;lid&quot;&gt;사계절&lt;/span&gt;이 나타남&lt;/li&gt;
+          &lt;li&gt;여름에는 덥고, 겨울에는 추움&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;중요성&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;사람들의 의식주나 산업 발전 등 생활에 많은 &lt;span class=&quot;lid&quot;&gt;영향&lt;/span&gt;을 줌&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/table&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+  &lt;h2&gt;2. 계절별 기후 특징&lt;/h2&gt;
+  &lt;table&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;width: 200px;&quot;&gt;계절&lt;/th&gt;
+      &lt;th&gt;기후 특징&lt;/th&gt;
+      &lt;th&gt;사람들의 생활 모습&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;봄&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;대체로 온화하고 건조하지만, 남씨의 변화가 심함. &lt;span class=&quot;lid&quot;&gt;농사&lt;/span&gt;를 시작하며, 꽃놀이를 하기도 함&lt;/td&gt;
+      &lt;td&gt;얇은 옷을 입고 야외 활동을 즐김&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;여름&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;span class=&quot;lid&quot;&gt;덥고&lt;/span&gt; &lt;span class=&quot;lid&quot;&gt;습한&lt;/span&gt; 기온이 놓고, 강수량이 많아 농작물이 잘 자람&lt;/td&gt;
+      &lt;td&gt;시원한 옷을 입고 피서를 감. 에어컨을 사용&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;가을&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;하늘이 높고 맑으며 &lt;span class=&quot;lid&quot;&gt;서늘&lt;/span&gt;함. 단풍이 들고 곡식이 익어감&lt;/td&gt;
+      &lt;td&gt;수확한 농작물을 저장하고 추수 행사를 함&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;겨울&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;span class=&quot;lid&quot;&gt;춥고&lt;/span&gt; &lt;span class=&quot;lid&quot;&gt;건조&lt;/span&gt;함. 눈이 내리고 기온이 낮아 땅이 얼기도 함&lt;/td&gt;
+      &lt;td&gt;두꺼운 옷을 입고 난방을 함. 눈썰매, 스키 등 겨울 스포츠를 즐김&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/table&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+  &lt;h2&gt;3. 우리나라의 기후 특징&lt;/h2&gt;
+  &lt;table&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;width: 300px;&quot;&gt;구분&lt;/th&gt;
+      &lt;th&gt;내용&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;평균 기온&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;
+        &lt;ul&gt;
+          &lt;li&gt;&lt;span class=&quot;lid&quot;&gt;여름&lt;/span&gt;(6~8월): 평균 기온 22~25°C로 높음&lt;/li&gt;
+          &lt;li&gt;&lt;span class=&quot;lid&quot;&gt;겨울&lt;/span&gt;(12~2월): 평균 기온 -6~3°C로 낮음&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;지역별 기온 차이&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;
+        &lt;ul&gt;
+          &lt;li&gt;남쪽은 북쪽보다 기온이 높음&lt;/li&gt;
+          &lt;li&gt;내륙은 &lt;span class=&quot;lid&quot;&gt;해안&lt;/span&gt;보다 기온 차가 큼&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;강수량 분포&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;
+        &lt;ul&gt;
+          &lt;li&gt;연 강수량은 &lt;span class=&quot;lid&quot;&gt;1,000~1,800mm&lt;/span&gt;&lt;/li&gt;
+          &lt;li&gt;여름철에 강수량이 많고 겨울철에는 적음&lt;/li&gt;
+          &lt;li&gt;남쪽 지역이 북쪽보다 강수량이 많음&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;바람의 영향&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;
+        &lt;ul&gt;
+          &lt;li&gt;여름에는 남동쪽에서 &lt;span class=&quot;lid&quot;&gt;따뜻&lt;/span&gt;하고 습한 바람이 불어옴&lt;/li&gt;
+          &lt;li&gt;겨울에는 북서쪽에서 &lt;span class=&quot;lid&quot;&gt;차갑&lt;/span&gt;고 건조한 바람이 불어옴&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/table&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+let opened = 0;
+const texts = [
+  '오랜 기간',
+  '강수',
+  '사계절',
+  '영향',
+  '농사',
+  '덥고',
+  '습한',
+  '서늘',
+  '춥고',
+  '건조',
+  '여름',
+  '겨울',
+  '해안',
+  '1,000~1,800mm',
+  '따뜻',
+  '차갑'
+];
+
+const lids = document.querySelectorAll('.lid');
+const countEl = document.getElementById('count');
+const totalEl = document.getElementById('total');
+const playBtn = document.getElementById('playBtn');
+
+totalEl.textContent = lids.length;
+
+lids.forEach((lid, index) =&gt; {
+  lid.addEventListener('click', function() {
+    if (!this.classList.contains('opened')) {
+      this.classList.add('opened');
+      this.textContent = texts[index];
+      opened++;
+      countEl.textContent = opened;
+    }
+  });
+});
+
+let isPlaying = false;
+let utterance = null;
+
+playBtn.addEventListener('click', function() {
+  if (!isPlaying) {
+    const text = `
+    기후가 무엇인지 알아볼까요.
+    
+    기후의 의미와 특징입니다.
+    기후란 오랜 기간 한 지역에서 나타나는 평균적이며 종합적인 대기 상태를 말합니다.
+    구성 요소로는 기온, 강수, 바람이 있으며, 우리나라는 사계절이 나타납니다.
+    기후는 사람들의 생활에 많은 영향을 줍니다.
+    
+    계절별 기후 특징입니다.
+    봄은 온화하고 농사를 시작합니다.
+    여름은 덥고 습하며 강수량이 많습니다.
+    가을은 서늘하고 곡식이 익어갑니다.
+    겨울은 춥고 건조하며 눈이 내립니다.
+    
+    우리나라의 기후 특징입니다.
+    여름 평균 기온은 22~25도이고, 겨울 평균 기온은 영하 6도에서 3도입니다.
+    남쪽이 북쪽보다 기온이 높고, 내륙은 해안보다 기온 차가 큽니다.
+    연 강수량은 1000~1800밀리미터이며, 여름철에 강수량이 많습니다.
+    여름에는 따뜻하고 습한 바람이, 겨울에"></iframe></div></div><div class="section"><div class="section-title desc-title">화면 요소 디스크립션</div><table><thead><tr><th class="no">No.</th><th class="name">요소명</th><th>설명</th></tr></thead><tbody><tr><td class="no">1</td><td class="name">페이지 제목</td><td>기후가 무엇인지 알아볼까요 - 메인 타이틀 표시 (정적)</td></tr><tr><td class="no">2</td><td class="name">오디오 플레이어</td><td>AI 음성 재생 컨트롤러와 진행 카운터 (인터랙션)</td></tr><tr><td class="no">3</td><td class="name">기후 의미 섹션</td><td>기후의 의미와 특징을 설명하는 테이블 - 의미/구성요소/사계/중요성 (정적)</td></tr><tr><td class="no">4</td><td class="name">뚜껑 버튼 그룹1</td><td>기후 의미 섹션 내 클릭하여 열어보는 핵심 단어들 - 오랜 기간/강수/사계절/영향 (인터랙션)</td></tr><tr><td class="no">5</td><td class="name">계절별 기후 섹션</td><td>봄/여름/가을/겨울 계절별 기후 특징과 생활 모습 테이블 (정적)</td></tr><tr><td class="no">6</td><td class="name">뚜껑 버튼 그룹2</td><td>계절별 기후 섹션 내 클릭하여 열어보는 핵심 단어들 - 농사/덥고/습한/서늘/춥고/건조 (인터랙션)</td></tr><tr><td class="no">7</td><td class="name">우리나라 기후 섹션</td><td>평균 기온/지역별 차이/강수량/바람의 영향 설명 테이블 (정적)</td></tr><tr><td class="no">8</td><td class="name">뚜껑 버튼 그룹3</td><td>우리나라 기후 섹션 내 클릭하여 열어보는 핵심 단어들 - 여름/겨울/해안/강수량/따뜻/차갑 (인터랙션)</td></tr><tr><td class="no">9</td><td class="name">진행 카운터</td><td>열어본 뚜껑 개수 실시간 표시 (데이터바인딩)</td></tr><tr><td class="no">10</td><td class="name">재생 버튼</td><td>음성 재생/일시정지 토글 버튼 (애니메이션)</td></tr></tbody></table></div></div></body></html>
